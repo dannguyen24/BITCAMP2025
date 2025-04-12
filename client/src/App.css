@@ -1,224 +1,42 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
-
-:root {
-  --primary-purple: #d1c4e9; /* Lighter pastel purple */
-  --secondary-purple: #b39ddb; /* Slightly darker pastel purple */
-  --accent-purple: #9575cd; /* Accent */
-  --dark-text: #4b415f; /* Darker purple for text */
-  --light-bg: #f8f7fc; /* Very light background */
-  --border-color: #e0ddee;
-  --white: #ffffff;
-  --shadow-color: rgba(149, 117, 205, 0.1); /* Subtle purple shadow */
-}
-
-body {
-  margin: 0;
-  font-family: 'Poppins', sans-serif;
-  background-color: var(--light-bg);
-  color: var(--dark-text);
-  overscroll-behavior: none; /* Prevents bounce scroll effect */
-}
-
-.app-container {
-  display: flex;
-  height: 100vh;
-  overflow: hidden; /* Prevent body scroll */
-}
-
-/* --- Sidebar --- */
-.sidebar {
-  width: 280px;
-  background-color: var(--white);
-  border-right: 1px solid var(--border-color);
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 2px 0 15px var(--shadow-color);
-  overflow-y: auto; /* Allow sidebar scroll if content exceeds height */
-}
-
-.sidebar h2 {
-  color: var(--accent-purple);
-  margin-top: 0;
-  margin-bottom: 25px;
-  font-size: 1.4em;
-  text-align: center;
-  border-bottom: 1px dashed var(--primary-purple);
-  padding-bottom: 10px;
-}
-
-.subject-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.subject-item {
-  margin-bottom: 15px;
-}
-
-.subject-header {
-  font-weight: 600;
-  color: var(--dark-text);
-  font-size: 1.1em;
-  margin-bottom: 8px;
-  cursor: default; /* Indicate it's not directly clickable */
-  padding-left: 5px;
-}
-
-.topic-list {
-  list-style: none;
-  padding: 0 0 0 15px; /* Indent topics */
-  margin: 0;
-}
-
-.topic-item {
-  padding: 8px 12px;
-  margin-bottom: 5px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease;
-  font-size: 0.95em;
-}
-
-.topic-item:hover {
-  background-color: var(--primary-purple);
-  color: var(--dark-text);
-}
-
-.topic-item.selected {
-  background-color: var(--secondary-purple);
-  color: var(--white);
-  font-weight: 500;
-}
-
-/* --- File Upload --- */
-.file-upload-area {
-  margin-top: auto; /* Push to the bottom */
-  padding-top: 20px;
-  border-top: 1px solid var(--border-color);
-}
-
-.file-input-label {
-  display: block;
-  padding: 10px 15px;
-  background-color: var(--primary-purple);
-  color: var(--dark-text);
-  border-radius: 6px;
-  text-align: center;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  margin-bottom: 10px;
-  font-weight: 500;
-}
-
-.file-input-label:hover {
-  background-color: var(--secondary-purple);
-  color: var(--white);
-}
-
-input[type="file"] {
-  display: none; /* Hide the default input */
-}
-
-.file-name {
-  font-size: 0.85em;
-  color: var(--accent-purple);
-  text-align: center;
-  margin-bottom: 10px;
-  word-break: break-all; /* Prevent long names overflowing */
-}
-
-.upload-button {
-  display: block;
-  width: 100%;
-  padding: 10px 15px;
-  background-color: var(--accent-purple);
-  color: var(--white);
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 500;
-  font-size: 1em;
-  transition: background-color 0.2s ease, opacity 0.2s ease;
-}
-
-.upload-button:hover {
-  background-color: var(--secondary-purple);
-}
-
-.upload-button:disabled {
-  background-color: var(--primary-purple);
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-/* --- Content Display --- */
-.content-display {
-  flex-grow: 1;
-  padding: 30px;
-  overflow-y: auto; /* Allow content scroll */
-  background-color: var(--light-bg);
-}
-
-.placeholder, .loading, .error {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-  font-size: 1.2em;
-  color: var(--secondary-purple);
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
   text-align: center;
 }
 
-.error {
-    color: #c0392b; /* Reddish for errors */
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
 }
 
-.content-section {
-  background-color: var(--white);
-  padding: 25px;
-  border-radius: 8px;
-  margin-bottom: 25px;
-  box-shadow: 0 4px 15px var(--shadow-color);
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-.content-section h3 {
-  margin-top: 0;
-  color: var(--accent-purple);
-  border-bottom: 1px solid var(--primary-purple);
-  padding-bottom: 10px;
-  margin-bottom: 15px;
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
 }
 
-.transcript-area, .resources-area {
-  white-space: pre-wrap; /* Preserve whitespace and wrap lines */
-  word-wrap: break-word; /* Break long words */
-  font-size: 0.95em;
-  line-height: 1.6;
-  color: var(--dark-text);
-  max-height: 40vh; /* Limit height and allow scrolling if needed */
-  overflow-y: auto;
-  background-color: #fdfcff; /* Slightly off-white bg for text areas */
-  padding: 15px;
-  border-radius: 5px;
-  border: 1px solid var(--border-color);
+.card {
+  padding: 2em;
 }
 
-/* --- Scrollbar Styling --- */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-::-webkit-scrollbar-track {
-  background: var(--light-bg);
-  border-radius: 10px;
-}
-::-webkit-scrollbar-thumb {
-  background-color: var(--primary-purple);
-  border-radius: 10px;
-  border: 2px solid var(--light-bg); /* Creates padding around thumb */
-}
-::-webkit-scrollbar-thumb:hover {
-  background-color: var(--secondary-purple);
+.read-the-docs {
+  color: #888;
 }
