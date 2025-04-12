@@ -3,8 +3,14 @@ from flask_cors import CORS
 from dotenv import load_dotenv
 from moviepy import VideoFileClip
 from pytube import YouTube
+from pytube.exceptions import VideoUnavailable
+import ffmpeg
+import logging
 import os
 import assemblyai as aai
+import yt_dlp
+
+logging.basicConfig(level=logging.INFO)
 
 
 app = Flask(__name__)
@@ -42,17 +48,38 @@ def convert_video_to_audio(video_path):
 def upload_link():
     data = request.get_json()
     video_url = data.get('link')
-  
-    yt = YouTube(video_url)
-    stream = yt.streams.filter(only_audio=True).first()
-
-    os.makedirs("audio", exist_ok=True)
-    output_file = stream.download(output_path="audio")
-    print(f"Downloaded to: {output_file}")
-
-    return transcribe(output_file)
-
+    output_path = os.path.join('audio', 'audio.wav')
     
+    try:
+        logging.info(f"Downloading audio from: {video_url}")
+        download_audio(video_url, output_path)
+        logging.info(f"Audio downloaded to: {output_path}")
+        
+        transcript_text = transcribe(output_path)
+        logging.info("Transcription completed")
+        
+        clean_up(output_path)
+        logging.info("Temporary files cleaned up")
+        
+        return jsonify({"transcript": transcript_text})
+    except Exception as e:
+        logging.error(f"An error occurred: {e}")
+        return jsonify({"error": str(e)}), 500
+
+def download_audio(video_url, output_path):
+    ydl_opts = {
+        'format': 'bestaudio/best',
+        'outtmpl': output_path,
+        'postprocessors': [{
+            'key': 'FFmpegExtractAudio',
+            'preferredcodec': 'wav',
+            'preferredquality': '192',
+        }],
+    }
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        ydl.download([video_url])
+
+
 def transcribe(audio_path):
     # Upload local audio file to AssemblyAI
     upload_url = transcriber.upload_file(audio_path)
@@ -62,6 +89,9 @@ def transcribe(audio_path):
     print(transcript.text)
     return jsonify({"transcript": transcript.text})
 
+def clean_up(file_path):
+    if os.path.exists(file_path):
+        os.remove(file_path)
 
 @app.route("/extract_keywords", methods=["GET"])
 def extract_keywords():
