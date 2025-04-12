@@ -1,3 +1,4 @@
+/* src/App.css */
 /* Let's get some nice fonts! Poppins is pretty cool! Downloaded from Google Fonts! */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
 
@@ -75,7 +76,6 @@ body {
   display: flex; /* Side-by-side layout magic! */
   height: 100vh; /* Full viewport height! */
   overflow: hidden; /* Prevent scrollbars on the container itself */
-  /* --- Use GAP for spacing between sidebar and content --- This is the fix! --- */
   gap: 15px; /* Adjust this value for desired spacing! */
 }
 
@@ -98,14 +98,72 @@ body {
 .upload-modal-button:hover { background-color: var(--accent-secondary); }
 /* Sidebar Scrollable Content Area (Folders/Topics) */
 .sidebar-content-scrollable { flex-grow: 1; overflow-y: auto; padding: 0 10px 20px 20px; }
+
 /* Subject/Class/Topic List Styling (Hierarchical look!) */
 .subject-list, .class-list, .topic-list { list-style: none; padding: 0; margin: 0; }
-.subject-item, .class-item { margin-bottom: 10px; }
-.subject-header { font-weight: 600; color: var(--text-primary); font-size: 1.1em; margin-bottom: 5px; padding-left: 5px; cursor: default; }
-.class-list { padding-left: 15px; }
-.class-header { font-weight: 500; color: var(--text-primary); font-size: 1.0em; margin-bottom: 5px; padding-left: 5px; cursor: default; }
-.topic-list { padding-left: 15px; }
-.topic-item { padding: 6px 10px; margin-bottom: 4px; border-radius: 5px; cursor: pointer; transition: background-color 0.2s ease, color 0.2s ease; font-size: 0.9em; word-break: break-word; color: var(--text-primary); }
+.subject-item, .class-item { margin-bottom: 5px; /* Reduced margin slightly */ } /* Reduced margin */
+
+/* === Styles for Clickable Headers (Subjects and Classes) === */
+.clickable-header {
+  cursor: pointer; /* Make it look clickable! */
+  padding: 4px 5px; /* Add some padding for easier clicking */
+  border-radius: 4px; /* Optional: slight rounding */
+  transition: background-color 0.15s ease; /* Subtle hover feedback */
+  display: flex; /* Align arrow and text */
+  align-items: center; /* Vertically center arrow and text */
+  /* Ensure it takes full available width within its parent list item maybe? */
+  /* width: 100%; box-sizing: border-box; */ /* Optional: if alignment seems off */
+}
+.clickable-header:hover {
+   background-color: var(--accent-tertiary); /* Use lightest purple for hover */
+}
+body.dark-mode .clickable-header:hover {
+    background-color: #3a3a4e; /* Use dark hover color */
+}
+
+/* === Arrow Styling === For collapsible headers */
+.sidebar-arrow {
+  display: inline-block; /* Allow transform */
+  margin-right: 6px; /* Space between arrow and text */
+  font-size: 0.7em; /* Make arrow smaller */
+  transition: transform 0.2s ease-in-out; /* Smooth rotation! */
+  transform: rotate(0deg); /* Default: pointing right (collapsed) */
+  color: var(--text-secondary); /* Use secondary text color for less emphasis */
+}
+/* Rotate arrow when the header is expanded (using class or attribute) */
+.clickable-header[aria-expanded="true"] .sidebar-arrow, /* Handle direct state */
+.sidebar-arrow.expanded { /* Handle class-based state if preferred */
+    transform: rotate(90deg); /* Point down when expanded! */
+}
+
+/* Subject Header Styles (Now part of clickable header) */
+.subject-header {
+  font-weight: 600; /* Bolder subjects */
+  color: var(--text-primary); /* Use primary text color */
+  font-size: 1.1em;
+  /* Removed margin-bottom, padding handles spacing now */
+  /* Removed padding-left, handled by clickable-header padding */
+}
+.class-list { padding-left: 15px; /* Keep indent for classes */ }
+/* Class Header Styles (Now part of clickable header) */
+.class-header {
+  font-weight: 500; /* Slightly less bold than subject */
+  color: var(--text-primary);
+  font-size: 1.0em; /* Slightly smaller */
+  /* Removed margin-bottom, padding handles spacing now */
+  /* Removed padding-left, handled by clickable-header padding */
+}
+.topic-list { padding-left: 15px; /* Keep indent for topics */ }
+/* Topic Item Styles */
+.topic-item {
+  padding: 6px 10px; margin-bottom: 4px; border-radius: 5px; cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  font-size: 0.9em; /* Smallest text */
+  word-break: break-word; /* Break long names */
+  color: var(--text-primary);
+  /* Add left margin to align with header text (after arrow space) */
+  margin-left: 14px; /* Adjust this based on arrow size + margin-right */
+}
 /* Topic Item Hover/Selected States - With Dark Mode Adjustments! */
 .topic-item:hover { background-color: var(--accent-tertiary); color: var(--text-primary); }
 body.dark-mode .topic-item:hover { background-color: #3a3a4e; color: var(--text-primary); }
@@ -115,7 +173,6 @@ body.dark-mode .topic-item.selected { background-color: var(--accent-primary); c
 /* --- Styles for the INVISIBLE Resizer Handle INSIDE Sidebar --- Adjusted for GAP --- */
 .sidebar-border-handle {
   position: absolute; top: 0; bottom: 0;
-  /* Place it right AT the edge now, the gap provides the space */
   right: -5px; /* Start slightly overlapping the edge into the gap */
   width: 10px; /* Keep it reasonably wide */
   cursor: col-resize; z-index: 10;
@@ -129,8 +186,7 @@ body.dark-mode .sidebar-border-handle:hover { /* background-color: rgba(255, 255
 /* --- Content Display Area Styles --- Where the good stuff is! Using Variables! --- */
 .content-display {
   flex-grow: 1; /* Takes up remaining space */
-  /* === Slightly Increased Padding === */
-  padding: 40px; /* Increased from 35px for a bit more internal breathing room */
+  padding: 40px; /* Slightly Increased Padding */
   overflow-y: auto; /* Allow scroll */
   background-color: var(--bg-primary); /* Themed background */
   min-width: 300px; /* Prevent squishing */
@@ -146,82 +202,65 @@ body.dark-mode .error { color: #e74c3c; }
 
 /* --- Note Entry Styles --- Increasing sizes/spacing! --- */
 .note-entry { /* Style for the card holding ONE note's info */
-   /* Inherits from .content-section */
-   /* === INCREASED MARGIN BOTTOM === More space AFTER each note card */
-   margin-bottom: 60px; /* Increased from 40px (or previous value) */
+   /* Inherits from .content-section (which now has transparent bg) */
+   margin-bottom: 60px; /* INCREASED space AFTER each note card */
 }
 
 .note-date { /* Style for the date */
-  /* === Slightly Larger Date Font === */
-  font-size: 0.95em; /* Increased from 0.9em */
+  font-size: 0.95em; /* Slightly Larger Date Font */
   color: var(--text-secondary); /* Use secondary text color */
-  margin-bottom: 30px; /* === INCREASED space below date === */
+  margin-bottom: 30px; /* INCREASED space below date */
   text-align: right; /* Align date to the right */
 }
 
 .note-subsection { /* Container for Topics Covered, Summary, etc. */
-  /* === INCREASED space BETWEEN subsections === */
-  margin-bottom: 35px; /* Increased from 30px */
+  margin-bottom: 35px; /* INCREASED space BETWEEN subsections */
 }
 /* Make the last subsection have less margin */
 .note-entry .note-subsection:last-child {
     margin-bottom: 25px; /* Keep last one slightly tighter */
 }
 
-
-.note-subsection h4 { /* Style for subsection titles (Topics Covered, Summary, etc.) */
-  margin-top: 0;
-  margin-bottom: 15px; /* === INCREASED space below title === */
+.note-subsection h4 { /* Style for subsection titles */
+  margin-top: 0; margin-bottom: 15px; /* INCREASED space below title */
   color: var(--accent-primary); /* Use primary accent color */
-  /* === Slightly Larger Title Font === */
-  font-size: 1.15em; /* Increased from 1.1em */
+  font-size: 1.15em; /* Slightly Larger Title Font */
   border-bottom: 1px dashed var(--border-primary); /* Dashed line separator */
-  padding-bottom: 8px; /* === Slightly more padding === */
-  display: inline-block; /* Make border only as wide as text */
+  padding-bottom: 8px; /* Slightly more padding */ display: inline-block;
 }
 
 .note-subsection ul { /* List style for Topics Covered array */
    list-style: disc; padding-left: 30px; /* Increased indent */
    margin: 0 0 10px 0; /* Increased bottom margin */
-   /* === Larger List Item Font & Spacing === */
-   font-size: 1em; /* Increased from 0.95em */
-   line-height: 1.7; /* Increased from 1.6 */
+   font-size: 1em; /* Larger List Item Font */
+   line-height: 1.7; /* Increased Spacing */
 }
 
 .note-subsection p { /* Paragraph style for Summary etc. */
-   margin: 0;
-   /* === Larger Paragraph Font & Spacing === */
-   font-size: 1em; /* Increased from 0.95em */
-   line-height: 1.7; /* Increased from 1.6 */
+   margin: 0; font-size: 1em; /* Larger Paragraph Font */ line-height: 1.7; /* Increased Spacing */
 }
 
-/* Content Sections (Base card style for .note-entry) */
-/* This defines the card look - Now with NO background/shadow itself! */
+/* Content Sections (Base card style for .note-entry) - Made transparent */
 .content-section {
   background-color: transparent; /* Make card background transparent */
-  padding: 0; /* Remove padding from here, add to subsections? No, keep padding on parent */
-  border-radius: 0;
-  margin-bottom: 0;
-  box-shadow: none;
+  padding: 0; /* Remove padding from here, applied to subsections/parent */
+  border-radius: 0; margin-bottom: 0; box-shadow: none;
   transition: background-color 0.3s ease;
-  width: 100%; /* Ensure it tries to take full container width */
-  box-sizing: border-box; /* Ensure padding included in width */
+  width: 100%; box-sizing: border-box;
 }
 
-/* Resources/Transcript Area Styles - Card-like look now */
+/* Resources/Transcript Area Styles - Now acts like the card */
 .resources-area, .transcript-area {
   white-space: pre-wrap; word-wrap: break-word;
-  font-size: 1em; /* Larger Font */
-  line-height: 1.7; /* Increased Spacing */
-  color: var(--text-primary);
-  max-height: 45vh; /* Allow More Height */
+  font-size: 1em; /* Larger Font */ line-height: 1.7; /* Increased Spacing */
+  color: var(--text-primary); max-height: 45vh; /* Allow More Height */
   overflow-y: auto;
-  /* === Give THESE areas the card background === */
+  /* === Give THESE areas the card background/border/shadow === */
   background-color: var(--bg-surface); /* Use surface background */
   padding: 20px; /* Increased padding */
   border-radius: 8px; /* Rounded corners */
   border: 1px solid var(--border-primary);
-  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
   box-shadow: 0 2px 5px var(--shadow-primary); /* Add subtle shadow here */
 }
 body.dark-mode .resources-area, body.dark-mode .transcript-area {
@@ -232,57 +271,20 @@ body.dark-mode .resources-area, body.dark-mode .transcript-area {
 
 /* --- Styles for Resource Table --- Looks professional! --- */
 .resource-table {
-  width: 100%; /* Make table take full width of its container */
-  border-collapse: collapse; /* Collapse borders for cleaner look */
-  margin-top: 10px; /* Space above table */
-  font-size: 0.95em; /* Slightly smaller text in table */
-  border: 1px solid var(--border-primary); /* Add outer border */
-  border-radius: 8px; /* Rounded corners for the table */
-  overflow: hidden; /* Clip corners */
+  width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.95em;
+  border: 1px solid var(--border-primary); border-radius: 8px; overflow: hidden;
   box-shadow: 0 2px 5px var(--shadow-primary); /* Add shadow to table */
 }
-.resource-table th,
-.resource-table td {
-  border: none; /* Remove internal borders */
-  border-bottom: 1px solid var(--border-primary); /* Horizontal lines only */
-  padding: 12px 15px; /* Increased Padding inside cells */
-  text-align: left; /* Align text left */
-  vertical-align: top; /* Align content to top of cell */
-  background-color: var(--bg-surface); /* Use surface background */
+.resource-table th, .resource-table td {
+  border: none; border-bottom: 1px solid var(--border-primary); padding: 12px 15px; text-align: left; vertical-align: top; background-color: var(--bg-surface);
 }
-.resource-table tr:last-child td {
-    border-bottom: none; /* Remove border on last row */
-}
-.resource-table th {
-  background-color: var(--bg-primary); /* Use primary background for header */
-  color: var(--text-primary); /* Use primary text */
-  font-weight: 600; /* Bolder header text */
-  white-space: nowrap; /* Prevent header text wrapping */
-  border-bottom-width: 2px; /* Make header bottom border thicker */
-}
-/* Dark mode header adjustment */
-body.dark-mode .resource-table th {
-    background-color: #3a3a4e; /* Slightly different dark shade for header */
-}
-/* Dark mode cell adjustment */
-body.dark-mode .resource-table td {
-    background-color: var(--dm-bg-surface); /* Match dark card bg */
-}
-/* Style links within the table */
-.resource-table a {
-  color: var(--accent-primary); /* Use accent color for links */
-  text-decoration: none; /* Remove underline by default */
-  font-weight: 500;
-}
-.resource-table a:hover {
-  color: var(--accent-secondary); /* Lighter accent on hover */
-  text-decoration: underline; /* Add underline on hover */
-}
-/* Style for 'N/A' text when link is missing */
-.resource-na {
-  color: var(--text-secondary); /* Use secondary text color */
-  font-style: italic; /* Italicize N/A */
-}
+.resource-table tr:last-child td { border-bottom: none; }
+.resource-table th { background-color: var(--bg-primary); color: var(--text-primary); font-weight: 600; white-space: nowrap; border-bottom-width: 2px; }
+body.dark-mode .resource-table th { background-color: #3a3a4e; }
+body.dark-mode .resource-table td { background-color: var(--dm-bg-surface); }
+.resource-table a { color: var(--accent-primary); text-decoration: none; font-weight: 500; }
+.resource-table a:hover { color: var(--accent-secondary); text-decoration: underline; }
+.resource-na { color: var(--text-secondary); font-style: italic; }
 /* --- End Resource Table Styles --- */
 
 
@@ -292,18 +294,14 @@ body.dark-mode .resource-table td {
 .collapsible-header:hover { color: var(--accent-secondary); }
 .collapse-arrow { display: inline-block; margin-right: 8px; transition: transform 0.2s ease-in-out; font-size: 0.8em; transform: rotate(0deg); }
 .collapsible-header[aria-expanded="true"] .collapse-arrow { transform: rotate(90deg); }
-.collapsible-content { /* Content shown/hidden by JS, padding inside .transcript-area */ }
+.collapsible-content { /* Padding/border applied to child (.transcript-area) */ }
 
 /* --- Note Divider --- Separating multiple notes --- Adjusted for Padding --- */
 hr.note-divider {
-  border: none; border-top: 1px solid var(--border-primary); /* Thinner maybe? */
-  /* Use padding above/below for spacing, margin for horizontal alignment */
+  border: none; border-top: 1px solid var(--border-primary); /* Thinner */
   margin: 0 40px 0 40px; /* T=0, R=40px, B=0, L=40px - Align with card padding */
-  padding-top: 50px; /* Creates space above */
-  padding-bottom: 50px; /* Creates space below */
-  box-sizing: content-box; /* Ensure padding adds to height */
-  height: 0; /* Ensure it has no height itself */
-  opacity: 0.5;
+  padding-top: 50px; /* Creates space above */ padding-bottom: 50px; /* Creates space below */
+  box-sizing: content-box; height: 0; opacity: 0.5;
 }
 
 
