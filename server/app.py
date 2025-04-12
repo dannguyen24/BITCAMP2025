@@ -11,6 +11,8 @@ import assemblyai as aai
 #for audio download from youtube link
 import yt_dlp
 from config.db import db
+from datetime import datetime
+
 
 # Import database configuration
 
@@ -113,7 +115,6 @@ def search_resources():
             "type": "video",
             "title": video_item['title'],
             "link": video_item['link'],
-            "isFree": True
         })
 
     # Fetch 1 non-YouTube result
@@ -125,7 +126,6 @@ def search_resources():
                     "type": "article",
                     "title": item['title'],
                     "link": item['link'],
-                    "isFree": True
                 })
                 break
 
@@ -157,11 +157,25 @@ def transcribe(audio_path):
         
         #Add the transcription into mongoDB
         document = {
+            'uploadDate': datetime(),
+            'topicsCovered': [
+                "Singly Linked Lists",
+                "Node Structure",
+                "Head Pointer",
+                "Traversal"
+            ],
+            'summary': "Introduced the fundamental concepts of singly linked lists, including node creation, head pointers, and basic list traversal.",
+            'structuredResources': [
+                {
+                    "topic": "Singly Linked Lists",
+                    "googleLink": "https://www.geeksforgeeks.org/linked-list-set-1-introduction/",
+                    "youtubeLink": "https://www.youtube.com/watch?v=njTh_OvY_zo"
+                }
+            ],
             'transcript': transcript.text,
-            'summary': "A short summary",
-            'subject': "Computer Science",
-            'nameClass': "CS101",
-            'nameTopic': "Introduction to Python"
+            'subject': "Math",
+            'class': "Calculus I",
+            'topic': ""
         }
         result = db.Documents.insert_one(document)
         logging.info(f"Inserted document ID: {result.inserted_id}")
