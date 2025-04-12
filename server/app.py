@@ -58,10 +58,21 @@ def upload_link():
 
 @app.route('/transcripts', methods=['GET'])
 def get_transcripts():
-    documents = list(db.information.find())
+    documents = list(db.Documents.find())
     for doc in documents:
         doc["_id"] = str(doc["_id"])  # Make it JSON serializable
     return jsonify(documents)
+
+
+@app.route("/test", methods=['GET'])
+def test():
+    try:
+        doc = db.Documents.find()
+        return jsonify(doc), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+    
 #####SAI's CODE
 
 GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
@@ -145,13 +156,26 @@ def transcribe(audio_path):
         clean_up(audio_path + ".wav")
         
         #Add the transcription into mongoDB
+        document = {
+            'transcript': transcript.text,
+            'summary': "A short summary",
+            'subject': "Computer Science",
+            'nameClass': "CS101",
+            'nameTopic': "Introduction to Python"
+        }
+        result = db.Documents.insert_one(document)
+        logging.info(f"Inserted document ID: {result.inserted_id}")
+
         
         #Generating creating summary from the transcription
         
         #Add summary to mongoDB
         
         logging.info("Temporary files cleaned up")
-        return jsonify({"transcript": transcript.text})
+        return jsonify({
+            "transcript": transcript.text,
+            "inserted_id": str(result.inserted_id)
+            })
     except Exception as e:
         logging.error(f"An error occurred: {e}")
         return jsonify({"error": str(e)}), 500
