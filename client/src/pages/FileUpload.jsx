@@ -17,7 +17,7 @@ function FileUpload() {
     try {
       const res = await axios.post('http://localhost:5000/upload', formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          'Content-Type': 'multipart/form-data', // set content type to multipart/form-data
         },
       });
       alert('File uploaded: ' + res.data);
