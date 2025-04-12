@@ -1,49 +1,39 @@
 import React from 'react';
-import FileUpload from './FileUpload'; // Gotta have the upload thingy here too!
+import FileUpload from '../pages/FileUpload'; 
 
-// This is the sidebar... holds the folders and the upload button! Pretty straightforward... kinda!
-function Sidebar({ structure, onSelectTopic, selectedItem, onFileUpload, isLoading }) {
-  // Get all the main subjects... like "Math", "English", whatever!
+// Sidebar's job: Show folders, let user click topics, AND host the upload component!
+// It gets the callback function 'onUploadSuccess' from App.jsx!
+function Sidebar({ structure, onSelectTopic, selectedItem, onUploadSuccess }) { // Added onUploadSuccess prop! Removed old upload props.
   const subjects = Object.keys(structure);
   console.log("Sidebar rendering with subjects:", subjects);
 
   return (
-    // 'aside' is like... a fancy div for sidebars, I guess? Semantic HTML! Yay!
     <aside className="sidebar">
       <h2>My Lectures! ✨</h2>
 
-      {/* This div holds the folder structure... gotta make it grow! */}
-      <div style={{ flexGrow: 1 }}>
-        {/* If there are no subjects AND we're not loading... tell the user to do something! */}
-        {subjects.length === 0 && !isLoading && (
-          <p style={{ textAlign: 'center', color: 'var(--secondary-purple)' }}>
-            It's kinda empty... maybe upload a lecture?! 🤔
-          </p>
+      {/* This div holds the folder structure... */}
+      <div style={{ flexGrow: 1, overflowY: 'auto', paddingRight: '5px' }}> {/* Added scroll + padding */}
+        {subjects.length === 0 && ( // Let's show loading state if App passes isLoading, otherwise show empty message
+           <p style={{ textAlign: 'center', color: 'var(--secondary-purple)' }}>
+               Loading structure or no lectures uploaded yet... 🤔
+            </p>
         )}
-        {/* Let's list out all the subjects... */}
         <ul className="subject-list">
           {subjects.map((subject) => (
-            // Each subject gets its own list item... easy!
             <li key={subject} className="subject-item">
-              {/* The subject name itself... not clickable, just... there! */}
               <div className="subject-header">{subject}</div>
-              {/* And INSIDE each subject... the topics! Nested lists... fun! */}
               <ul className="topic-list">
-                {/* Loop through the topics for THIS subject... */}
                 {Object.keys(structure[subject]).map((topic) => (
-                  // Each topic IS clickable! Woo!
                   <li
-                    key={topic} // React needs keys, don't ask me why... okay fine, it's for performance!
-                    // Add a 'selected' class if this is the one they clicked... makes it look different!
+                    key={topic}
                     className={`topic-item ${
                       selectedItem?.subject === subject && selectedItem?.topic === topic
                         ? 'selected'
-                        : '' // Otherwise... no extra class!
+                        : ''
                     }`}
-                    // When clicked... tell the main App component which one!!
                     onClick={() => onSelectTopic(subject, topic)}
                   >
-                    {topic} {/* Just show the topic name... */}
+                    {topic}
                   </li>
                 ))}
               </ul>
@@ -53,8 +43,13 @@ function Sidebar({ structure, onSelectTopic, selectedItem, onFileUpload, isLoadi
       </div>
 
 
-      {/* And at the bottom... the file upload component we made! */}
-      <FileUpload onFileUpload={onFileUpload} isLoading={isLoading} />
+      {/* --- RENDER THE FILE UPLOAD COMPONENT --- */}
+      {/* We just slap the component from src/pages right here! */}
+      {/* And crucially, pass down the onUploadSuccess function we got from App.jsx! */}
+      <div className="file-upload-area"> {/* Keep the styling container maybe? */}
+          <FileUpload onUploadSuccess={onUploadSuccess} />
+      </div>
+
     </aside>
   );
 }
