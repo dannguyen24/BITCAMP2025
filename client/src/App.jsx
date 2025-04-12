@@ -1,3 +1,6 @@
+import { useState } from "react";
+import { Routes, Route } from "react-router-dom";
+import FileUpload from "./pages/FileUpload";
 import React, { useState, useEffect, useCallback } from 'react';
 import Sidebar from './components/Sidebar';
 import ContentDisplay from './components/ContentDisplay';
@@ -160,25 +163,14 @@ function App() {
 
   // Finally, the JSX for the whole App! Structure time!
   return (
-    // The main container div... flexbox magic happens in CSS!
-    <div className="app-container">
-      {/* Render the Sidebar... pass down all the state and functions it needs! */}
-      <Sidebar
-        structure={folderStructure}
-        onSelectTopic={handleSelectTopic}
-        selectedItem={selectedItem}
-        onFileUpload={handleFileUpload}
-        // Only pass true isLoading for the upload button if content isn't ALSO loading... avoids disabling upload during content fetch! ...maybe?
-        isLoading={isLoading && !currentContent}
-      />
-      {/* Render the Content Display area... pass down the stuff it needs too! */}
-      <ContentDisplay
-        content={currentContent}
-        selectedItem={selectedItem}
-        isLoading={isLoading} // Let it know if *anything* is loading!
-        error={error} // Pass down any errors!
-      />
-    </div>
+    <>
+      <h1>File Upload Example</h1>
+
+      <Routes>
+        <Route path="/" element={<h2>Home Page</h2>} />
+        <Route path="/upload" element={<FileUpload />} />
+      </Routes>
+    </>
   );
 }
 
