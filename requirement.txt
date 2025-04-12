@@ -1,3 +1,9 @@
 Flask
 pymongo[srv]
 Flask-PyMongo
+logging
+assemblyai
+dotenv
+yt_dlp
+datetime
+requests
