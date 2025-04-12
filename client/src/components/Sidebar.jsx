@@ -1,13 +1,12 @@
-// src/components/Sidebar.jsx
-
-// Gotta get React, specifically forwardRef 'cause App.jsx is passing a ref down! Fancy!
+// Gotta get React, specifically forwardRef 'cause App.jsx is passing a ref down! 
 import React from 'react';
-// And we need our FileUpload component, which lives up one level in 'pages'!
-import FileUpload from '../pages/FileUpload';
+// !!! No longer need FileUpload import here! It lives in the Modal now! !!!
+// import FileUpload from '../pages/FileUpload';
 
-// Wrap the whole component definition in React.forwardRef!
+// Okay, wrap the whole component definition in React.forwardRef!
 // It receives 'props' (which we destructure) and the 'ref' from the parent (App.jsx)!
-const Sidebar = React.forwardRef(({ structure, onSelectTopic, selectedItem, onUploadSuccess, style, onResizeMouseDown }, ref) => {
+// Gets the new 'onOpenUploadModal' prop now! Doesn't need 'onUploadSuccess' anymore!
+const Sidebar = React.forwardRef(({ structure, onSelectTopic, selectedItem, style, onResizeMouseDown, onOpenUploadModal }, ref) => {
   // Get the list of subjects (like "Math", "English") from the structure data!
   const subjects = Object.keys(structure);
 
@@ -31,8 +30,23 @@ const Sidebar = React.forwardRef(({ structure, onSelectTopic, selectedItem, onUp
 
 
       {/* --- The ACTUAL Visible Content --- */}
-      {/* The title! Gotta have a title! */}
-      <h2>My Lectures! ✨</h2>
+
+      {/* --- Title Area --- Now with an Upload Button! --- */}
+      {/* Wrap title and button in a div for easy flex layout! */}
+      <div className="sidebar-title-area">
+        {/* The title! Gotta have a title! */}
+        <h2>My Lectures! ✨</h2>
+        {/* The button to open the modal! Calls the function passed from App.jsx! */}
+        <button
+            onClick={onOpenUploadModal} // CLICK ME to open the popup! Calls App.jsx's openModal function!
+            className="upload-modal-button" // Class for styling!
+            title="Upload New Lecture" // Tooltip for accessibility/clarity!
+        >
+          + Upload {/* Simple text or an icon! You choose! */}
+        </button>
+      </div>
+      {/* --- End Title Area --- */}
+
 
       {/* This div holds the main scrolling content (the folders) */}
       {/* Needs 'overflow-y: auto' in CSS so it scrolls if needed! */}
@@ -40,7 +54,7 @@ const Sidebar = React.forwardRef(({ structure, onSelectTopic, selectedItem, onUp
         {/* If there are no subjects yet, show a little message! */}
         {subjects.length === 0 && (
            <p style={{ textAlign: 'center', color: 'var(--secondary-purple)' }}>
-               Loading... or maybe just empty? Try uploading! 🤔
+               Loading... or maybe just empty? Try uploading via the button above! 🤔
             </p>
         )}
         {/* The list of subjects! */}
@@ -57,11 +71,7 @@ const Sidebar = React.forwardRef(({ structure, onSelectTopic, selectedItem, onUp
                   <li
                     key={topic} // React keys... essential!
                     // Add 'selected' class if this is the one! Highlights it!
-                    className={`topic-item ${
-                      selectedItem?.subject === subject && selectedItem?.topic === topic
-                        ? 'selected'
-                        : '' // Empty string if not selected!
-                    }`}
+                    className={`topic-item ${ selectedItem?.subject === subject && selectedItem?.topic === topic ? 'selected' : '' }`}
                     // When clicked, call the function from App.jsx! Tell it which one!
                     onClick={() => onSelectTopic(subject, topic)}
                   >
@@ -74,17 +84,14 @@ const Sidebar = React.forwardRef(({ structure, onSelectTopic, selectedItem, onUp
         </ul> {/* End subjects list */}
       </div> {/* End scrollable area */}
 
-      {/* And finally, the file upload section at the bottom! */}
-      <div className="file-upload-area">
-          {/* Render the FileUpload component! */}
-          {/* Pass down the 'onUploadSuccess' function so it can tell App.jsx to refresh! */}
-          <FileUpload onUploadSuccess={onUploadSuccess} />
-      </div>
-      {/* --- End Visible Content --- */}
+
+      {/* --- The old FileUpload area is GONE! Removed! Deleted! --- */}
+      {/* It now lives inside the UploadModal component! Cleaner sidebar! Yay! */}
+      {/* --- End Removed Area --- */}
 
     </aside> // End of the <aside> element
   ); // End of return statement
-}); // End of React.forwardRef wrapper
+}); // IMPORTANT! Close the React.forwardRef wrapper!
 
 // Export the Sidebar component! Make it usable!
 export default Sidebar;

@@ -1,4 +1,3 @@
-// src/pages/FileUpload.jsx
 import React, { useState } from 'react'; // Still need useState!
 import axios from 'axios'; // Axios for those sweet HTTP requests!
 

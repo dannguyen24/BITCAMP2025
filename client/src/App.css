@@ -1,370 +1,439 @@
 /* src/App.css */
-/* Let's get some nice fonts! Poppins is pretty cool! */
+/* Let's get some nice fonts! Poppins is pretty cool! Downloaded from Google Fonts! */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
 
-/* --- Theme Variables --- Our Pastel Purple Paradise! 💜 --- */
-/* Define colors here so we can reuse them easily! Yay variables! */
+/* --- Theme Variables --- Our Color Palette! Organized and Semantic! 🎨 --- */
+/* Define colors here so we can reuse them easily! Yay variables! No more hunting hex codes! */
 :root {
-  --primary-purple: #d1c4e9; /* Lighter pastel */
-  --secondary-purple: #b39ddb; /* Medium pastel */
-  --accent-purple: #9575cd; /* Darker accent */
-  --dark-text: #4b415f; /* Dark purple text, easier to read! */
-  --light-bg: #f8f7fc; /* Very light background, almost white */
-  --border-color: #e0ddee; /* Soft border color */
-  --white: #ffffff; /* Plain ol' white */
-  --shadow-color: rgba(149, 117, 205, 0.1); /* Subtle purple shadow! Spooky! */
+  /* Light Mode (Default - though JS now defaults to dark!) Colors - Semantic Names! */
+  --bg-primary: var(--light-bg, #f8f7fc);        /* Main page background */
+  --bg-surface: var(--white, #ffffff);         /* Card/Sidebar/Modal background */
+  --text-primary: var(--dark-text, #4b415f);      /* Main text color */
+  --text-secondary: var(--secondary-purple, #b39ddb); /* Softer text, placeholder text */
+  --text-on-accent: var(--white, #ffffff);       /* Text on accent buttons */
+  --accent-primary: var(--accent-purple, #9575cd);   /* Main interactive purple */
+  --accent-secondary: var(--secondary-purple, #b39ddb); /* Lighter interactive purple */
+  --accent-tertiary: var(--primary-purple, #d1c4e9);    /* Lightest interactive purple */
+  --border-primary: var(--border-color, #e0ddee);    /* Default borders */
+  --shadow-primary: var(--shadow-color, rgba(149, 117, 205, 0.1)); /* Default shadows */
+  --scroll-track: var(--light-bg, #f8f7fc);        /* Scrollbar track color */
+  --scroll-thumb: var(--primary-purple, #d1c4e9);   /* Scrollbar thumb color */
+  --scroll-thumb-hover: var(--secondary-purple, #b39ddb); /* Scrollbar thumb hover color */
+
+  /* Original names kept for reference/backward compat if absolutely needed, but try to use semantic ones! */
+  --light-bg: #f8f7fc;
+  --white: #ffffff;
+  --dark-text: #4b415f;
+  --accent-purple: #9575cd;
+  --secondary-purple: #b39ddb;
+  --primary-purple: #d1c4e9;
+  --border-color: #e0ddee;
+  --shadow-color: rgba(149, 117, 205, 0.1);
 }
 
-/* --- Basic Body Styles --- Setting the stage! --- */
+/* --- Dark Mode Color Definitions --- Spooky Mode Activated! 👻🌑 --- */
+/* This block applies ONLY when the body tag has the 'dark-mode' class! */
+body.dark-mode {
+  /* Define dark mode specific values using temporary names first */
+  --dm-bg-primary: #1a1a2e; /* Dark Navy/Purple background */
+  --dm-bg-surface: #2a2a3e; /* Darker Grey/Purple for cards/sidebar */
+  --dm-text-primary: #e0e0ff; /* Light lavender/white text */
+  --dm-text-secondary: #a0a0cf; /* Muted light purple for secondary text */
+  --dm-text-on-accent: #ffffff; /* White text still works on our purples! */
+  --dm-accent-primary: #a188da; /* Slightly brighter accent purple */
+  --dm-accent-secondary: #c4b5fc; /* Lighter secondary purple */
+  --dm-accent-tertiary: #e0ddee; /* Very light tertiary purple (was border color) */
+  --dm-border-primary: #40405f; /* Muted dark grey/purple border */
+  --dm-shadow-primary: rgba(0, 0, 0, 0.25); /* Standard darker shadow */
+  --dm-scroll-track: #2a2a3e; /* Dark scrollbar track */
+  --dm-scroll-thumb: #40405f; /* Dark scrollbar thumb */
+  --dm-scroll-thumb-hover: #5c5c8a; /* Dark scrollbar thumb hover */
+
+  /* --- !!! Reassign the main variables !!! --- */
+  /* This is the magic! Override the default :root variables! */
+  --bg-primary: var(--dm-bg-primary);
+  --bg-surface: var(--dm-bg-surface);
+  --text-primary: var(--dm-text-primary);
+  --text-secondary: var(--dm-text-secondary);
+  --text-on-accent: var(--dm-text-on-accent);
+  --accent-primary: var(--dm-accent-primary);
+  --accent-secondary: var(--dm-accent-secondary);
+  --accent-tertiary: var(--dm-accent-tertiary);
+  --border-primary: var(--dm-border-primary);
+  --shadow-primary: var(--dm-shadow-primary);
+  --scroll-track: var(--dm-scroll-track);
+  --scroll-thumb: var(--dm-scroll-thumb);
+  --scroll-thumb-hover: var(--dm-scroll-thumb-hover);
+
+  /* Keep original names assigned too if needed, though redundant if using semantic ones */
+  --light-bg: var(--dm-bg-primary);
+  --white: var(--dm-bg-surface);
+  --dark-text: var(--dm-text-primary);
+  --accent-purple: var(--dm-accent-primary);
+  --secondary-purple: var(--dm-accent-secondary);
+  --primary-purple: var(--dm-accent-tertiary);
+  --border-color: var(--dm-border-primary);
+  --shadow-color: var(--dm-shadow-primary);
+}
+
+
+/* --- Basic Body Styles --- Apply the variables! Getting Dressed! --- */
 body {
-  margin: 0; /* No default margins, please! */
-  font-family: 'Poppins', sans-serif; /* Use our nice font! */
-  background-color: var(--light-bg); /* Set the main page background */
-  color: var(--dark-text); /* Default text color */
-  overscroll-behavior: none; /* Stops that weird bounce effect on some browsers */
-  overflow: hidden; /* Prevent body itself from scrolling, app-container handles it */
+  margin: 0; /* No default margins! */
+  font-family: 'Poppins', sans-serif; /* Use our lovely font! */
+  background-color: var(--bg-primary); /* Use variable for background! */
+  color: var(--text-primary); /* Use variable for main text color! */
+  overscroll-behavior: none; /* Stop weird browser bounce/refresh behaviors */
+  overflow: hidden; /* Prevent BODY scrollbars */
+  transition: background-color 0.3s ease, color 0.3s ease; /* Smooth theme transition! Nice! */
 }
 
-/* --- Main App Layout --- Flexbox Power! --- */
+/* --- Main App Layout --- Flexbox Power! The Big Picture! --- */
 .app-container {
-  display: flex; /* THIS IS KEY! Puts sidebar and content side-by-side! */
-  height: 100vh; /* Make the app fill the entire viewport height! */
-  overflow: hidden; /* Don't let the container itself scroll */
+  display: flex; /* Side-by-side layout magic! */
+  height: 100vh; /* Full viewport height! */
+  overflow: hidden; /* Prevent scrollbars on the container itself */
+  gap: 30px; /* Space between sidebar and content area */
 }
 
-/* --- Sidebar Styles --- The Navigator! --- */
+/* --- Sidebar Styles --- The Navigator! Using Variables! --- */
 .sidebar {
-  /* NO fixed width anymore! It comes from App.jsx's inline style! */
-  /* width: 280px; */ /* DELETE or comment out! */
-  background-color: var(--white); /* White background */
-  /* Maybe remove the border here, the handle can imply the edge */
-  /* border-right: 1px solid var(--border-color); */
-  display: flex; /* Use flexbox internally too! */
-  flex-direction: column; /* Stack title, content, upload vertically! */
-  box-shadow: 2px 0 15px var(--shadow-color); /* Nice subtle shadow */
-  flex-shrink: 0; /* IMPORTANT! Prevent sidebar from shrinking when content grows! */
-  position: relative; /* CRUCIAL! Needed for the absolute positioned handle inside! */
-  overflow: hidden; /* Hide anything that tries to escape the bounds! */
-  /* Let's add transition for smoother resize effect? Maybe? */
-  /* transition: width 0.05s ease-out; */ /* Can feel laggy, maybe remove */
+  /* Dynamic width set by JS inline style, so no 'width' rule here! */
+  background-color: var(--bg-surface); /* Use surface background variable! */
+  /* border-right: 1px solid var(--border-primary); */ /* Optional border */
+  display: flex; /* Use flexbox for internal layout */
+  flex-direction: column; /* Stack children vertically */
+  box-shadow: 2px 0 15px var(--shadow-primary); /* Use shadow variable! */
+  flex-shrink: 0; /* Stop it from shrinking! */
+  position: relative; /* Needed for the absolute positioned handle! */
+  overflow: hidden; /* Hide internal overflow */
+  transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Smooth theme transition! */
 }
 
-/* The area WITHIN the sidebar that actually scrolls! */
+/* Styles for the Title Area in Sidebar (Title + Upload Button) */
+.sidebar-title-area {
+  display: flex; /* Align items horizontally */
+  justify-content: space-between; /* Push title left, button right */
+  align-items: center; /* Center items vertically */
+  padding: 15px 20px 0px 20px; /* Padding: T R B L */
+  margin-bottom: 10px; /* Space below this area */
+  flex-shrink: 0; /* Prevent shrinking */
+}
+/* Title Text */
+.sidebar-title-area h2 {
+  margin: 0; /* Remove default margin */
+  color: var(--accent-primary); /* Use accent color */
+  font-size: 1.4em; /* Title size */
+  white-space: nowrap; /* Keep title on one line */
+  overflow: hidden; /* Hide overflow */
+  text-overflow: ellipsis; /* Show ... if too long */
+}
+/* Upload Modal Button in Title Area */
+.upload-modal-button {
+  padding: 5px 10px; /* Button size */
+  font-size: 0.9em; /* Text size */
+  font-weight: 500;
+  background-color: var(--accent-primary); /* Use accent color */
+  color: var(--text-on-accent); /* Text color for on accent */
+  border: none; /* No border */
+  border-radius: 5px; /* Rounded corners */
+  cursor: pointer; /* Clicky hand */
+  transition: background-color 0.2s ease; /* Smooth hover */
+  white-space: nowrap; /* Keep text together */
+  margin-left: 10px; /* Space from title */
+}
+.upload-modal-button:hover {
+  background-color: var(--accent-secondary); /* Use secondary accent on hover */
+}
+
+/* Sidebar Scrollable Content Area (Folders/Topics) */
 .sidebar-content-scrollable {
-    flex-grow: 1; /* Take up available vertical space between title and upload! */
-    overflow-y: auto; /* YES! Allow vertical scrolling HERE if content is too tall! */
-    padding: 0 10px 20px 20px; /* Top(0) Right(10px to avoid handle) Bottom(20px) Left(20px) */
+    flex-grow: 1; /* Take up vertical space */
+    overflow-y: auto; /* Allow scrolling if needed */
+    padding: 0 10px 20px 20px; /* Padding: T R(handle space) B L */
 }
-
-/* Adjustments for elements inside the sidebar */
-.sidebar h2 {
-    padding: 20px 20px 0 20px; /* Add padding back, maybe less bottom? */
-    margin-bottom: 15px; /* Space below title */
-    margin-top: 0;
-    color: var(--accent-purple); /* Use accent color */
-    flex-shrink: 0; /* Don't let title shrink */
-}
-
-/* Subject/Topic List Styling */
-.subject-list, .topic-list {
-  list-style: none; /* Remove default bullets */
-  padding: 0;
-  margin: 0;
-}
-.subject-item {
-  margin-bottom: 15px;
-}
+/* Subject/Topic List Styling (Hierarchical look!) */
+.subject-list, .topic-list { list-style: none; padding: 0; margin: 0; }
+.subject-item { margin-bottom: 15px; }
 .subject-header {
-  font-weight: 600;
-  color: var(--dark-text);
-  font-size: 1.1em;
-  margin-bottom: 8px;
-  padding-left: 5px; /* Little indent */
-  cursor: default; /* Not clickable */
+  font-weight: 600; /* Bolder subjects */
+  color: var(--text-primary); /* Use primary text color */
+  font-size: 1.1em; margin-bottom: 8px; padding-left: 5px; cursor: default;
 }
-.topic-list {
-  padding-left: 15px; /* Indent topics under subjects */
-}
+.topic-list { padding-left: 15px; /* Indent topics */ }
 .topic-item {
-  padding: 8px 12px;
-  margin-bottom: 5px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease; /* Smooth hover/select */
-  font-size: 0.95em;
-  word-break: break-word; /* Break long topic names */
+  padding: 8px 12px; margin-bottom: 5px; border-radius: 6px; cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease; /* Smooth transitions */
+  font-size: 0.95em; word-break: break-word;
+  color: var(--text-primary); /* Use primary text color */
 }
+/* Topic Item Hover/Selected States - With Dark Mode Adjustments! */
 .topic-item:hover {
-  background-color: var(--primary-purple); /* Hover effect! */
-  color: var(--dark-text);
+  background-color: var(--accent-tertiary); /* Lightest purple hover */
+  color: var(--text-primary); /* Keep text readable */
+}
+body.dark-mode .topic-item:hover { /* Different hover for dark mode! */
+  background-color: #3a3a4e; /* Darker surface hover */
+  color: var(--text-primary); /* Use light text for dark mode */
 }
 .topic-item.selected {
-  background-color: var(--secondary-purple); /* Selected item style! */
-  color: var(--white);
+  background-color: var(--accent-secondary); /* Use secondary accent for selected */
+  color: var(--text-on-accent); /* Use text-on-accent color */
   font-weight: 500;
 }
-
-/* File Upload Area at the bottom */
-.sidebar .file-upload-area {
-    padding: 15px 20px 20px 20px; /* Padding around upload controls */
-    border-top: 1px solid var(--border-color); /* Separator line */
-    flex-shrink: 0; /* Don't let upload area shrink! */
+body.dark-mode .topic-item.selected { /* Different selected for dark mode! */
+    background-color: var(--accent-primary); /* Use primary accent for dark mode selected */
+    color: var(--text-on-accent); /* Text still works */
 }
 
-/* Styles for the simple upload elements inside the sidebar (adjust as needed) */
-.sidebar-file-upload h4 { /* Header inside upload area */
-   margin-top: 0;
-   margin-bottom: 10px;
-   color: var(--accent-purple);
-   font-size: 1em;
-   font-weight: 500;
-}
-.sidebar-file-upload input[type="file"] {
-   display: block;
-   margin-bottom: 10px;
-   width: 100%;
-   color: var(--dark-text);
-   font-size: 0.9em;
-}
-.sidebar-file-upload input[type="file"]::file-selector-button { /* Style the default "Choose File" button */
-   padding: 5px 10px;
-   border-radius: 4px;
-   border: 1px solid var(--primary-purple);
-   background-color: var(--primary-purple);
-   color: var(--dark-text);
-   cursor: pointer;
-   transition: background-color 0.2s ease;
-   font-size: 0.9em;
-   margin-right: 10px;
-}
-.sidebar-file-upload input[type="file"]::file-selector-button:hover {
-   background-color: var(--secondary-purple);
-   color: var(--white);
-}
-.sidebar-file-upload button { /* Style the actual "Upload" button */
-   display: block;
-   width: 100%;
-   padding: 8px 15px;
-   background-color: var(--accent-purple);
-   color: var(--white);
-   border: none;
-   border-radius: 6px;
-   cursor: pointer;
-   font-weight: 500;
-   font-size: 0.95em;
-   transition: background-color 0.2s ease, opacity 0.2s ease;
-   margin-top: 5px;
-}
-.sidebar-file-upload button:hover {
-   background-color: var(--secondary-purple);
-}
-.sidebar-file-upload button:disabled {
-   background-color: var(--primary-purple);
-   opacity: 0.7;
-   cursor: not-allowed;
-}
-.sidebar-file-upload p { /* Style for the "Selected: filename" text */
-    font-size: 0.8em;
-    margin: 8px 0 0 0;
-    color: var(--secondary-purple);
-    overflow-wrap: break-word; /* Wrap long filenames */
-    text-align: center;
-}
-
-
-/* --- Styles for the Invisible Resizer Handle INSIDE Sidebar --- */
+/* --- Styles for the INVISIBLE Resizer Handle INSIDE Sidebar --- Sneaky! --- */
 .sidebar-border-handle {
-  position: absolute; /* Position relative to parent (.sidebar)! */
-  top: 0; /* Stretch from top... */
-  bottom: 0; /* ...to bottom! */
-  right: 0; /* Stick it to the RIGHT edge! */
-  width: 10px; /* How wide is the clickable/draggable area? */
-  cursor: col-resize; /* YES! Show the resize cursor! */
-  z-index: 10; /* Make sure it's on top if other things overlap */
-  /* For debugging, make it visible! Then make it transparent! */
-  /* background-color: rgba(0, 255, 0, 0.2); */ /* Green ghost handle! */
-  transition: background-color 0.15s ease; /* Subtle hover effect */
+  position: absolute; /* Position relative to the sidebar! */
+  top: 0; bottom: 0; right: 0; /* Stick to the right edge, full height! */
+  width: 10px; /* The draggable zone width! */
+  cursor: col-resize; /* The resize cursor! Essential hint! */
+  z-index: 10; /* On top of nearby elements! */
+  /* background-color: rgba(0, 255, 0, 0.1); */ /* DEBUG: Uncomment to see the green handle */
 }
-
-.sidebar-border-handle:hover {
-  /* Maybe show a *very* subtle color on hover so user knows it's there? */
-   /* background-color: rgba(149, 117, 205, 0.08); */ /* Super faint purple maybe? */
+/* Optional Dark Mode Handle Hover - subtle effect! */
+body.dark-mode .sidebar-border-handle:hover {
+   /* background-color: rgba(255, 255, 255, 0.05); */ /* Very faint light edge maybe? */
 }
 /* --- End Invisible Handle Styles --- */
 
 
-/* --- Content Display Area Styles --- Where the main info lives! --- */
+/* --- Content Display Area Styles --- Where the good stuff is! Using Variables! --- */
 .content-display {
-  flex-grow: 1; /* CRITICAL! Makes this div take up all remaining horizontal space! */
-  padding: 30px; /* Nice spacing inside */
-  overflow-y: auto; /* Allow content to scroll vertically if it's too long! */
-  background-color: var(--light-bg); /* Match the body background maybe? */
-  min-width: 300px; /* Stop it from getting ridiculously squished! */
+  flex-grow: 1; /* CRITICAL! Takes up remaining horizontal space! */
+  padding: 30px; /* Inner spacing */
+  overflow-y: auto; /* Allow vertical scroll for long content */
+  background-color: var(--bg-primary); /* Use primary background variable! */
+  min-width: 300px; /* Prevent excessive squishing */
+  transition: background-color 0.3s ease, margin-left 0.3s ease; /* Smooth transitions */
 }
 
-/* Placeholder/Loading/Error Styles */
+/* Placeholder/Loading/Error Message Styles */
 .placeholder, .loading, .error {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: calc(100% - 60px); /* Fill height minus padding */
-  font-size: 1.2em;
-  color: var(--secondary-purple);
-  text-align: center;
+  display: flex; justify-content: center; align-items: center; /* Center the text */
+  height: calc(100% - 60px); /* Approximate full height minus padding */
+  font-size: 1.2em; /* Readable size */
+  color: var(--text-secondary); /* Use secondary text color variable */
+  text-align: center; /* Center text */
 }
-.error {
-    color: #c0392b; /* Angry red for errors! */
-}
-.loading {
-    /* Maybe add a spinner later? For now, text is fine! */
-}
+/* Error specific color - keep it distinct! */
+.error { color: #c0392b; }
+body.dark-mode .error { color: #e74c3c; /* Brighter red for dark mode visibility */ }
+.loading { /* Could add spinner animation here later! */ }
 
-/* Styles for the content sections (Transcription, Resources) */
+/* Content Sections (The white/dark cards) */
 .content-section {
-  background-color: var(--white); /* White cards for content */
-  padding: 25px;
-  border-radius: 8px;
-  margin-bottom: 25px;
-  box-shadow: 0 4px 15px var(--shadow-color); /* Use our shadow color! */
+  background-color: var(--bg-surface); /* Use surface background variable */
+  padding: 25px; border-radius: 8px; margin-bottom: 25px;
+  box-shadow: 0 4px 15px var(--shadow-primary); /* Use shadow variable */
+  transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Smooth theme transition */
 }
+/* Heading inside the content cards (Transcription, Resources) */
 .content-section h3 {
-  margin-top: 0;
-  color: var(--accent-purple);
-  border-bottom: 1px solid var(--primary-purple); /* Nice separator line */
-  padding-bottom: 10px;
-  margin-bottom: 15px;
+  margin-top: 0; /* Remove default top margin */
+  color: var(--accent-primary); /* Use primary accent color variable */
+  border-bottom: 1px solid var(--accent-tertiary); /* Use tertiary accent as border */
+  padding-bottom: 10px; /* Space below text, above border */
+  margin-bottom: 15px; /* Space below border, above content */
 }
+/* Styling for the text areas holding transcript/resources */
 .transcript-area, .resources-area {
-  white-space: pre-wrap; /* Respect whitespace and wrap lines! Important! */
-  word-wrap: break-word; /* Break long words that don't have spaces */
-  font-size: 0.95em;
-  line-height: 1.6; /* Make text breathable */
-  color: var(--dark-text); /* Use our text color */
-  max-height: 40vh; /* Limit height, make it scrollable if needed */
-  overflow-y: auto; /* Scrollbar if too tall! */
-  background-color: #fdfcff; /* Slightly off-white background */
-  padding: 15px;
-  border-radius: 5px;
-  border: 1px solid var(--border-color); /* Subtle border */
+  white-space: pre-wrap; /* RESPECT THE LINE BREAKS! Crucial! */
+  word-wrap: break-word; /* Break long words if needed */
+  font-size: 0.95em; /* Text size */
+  line-height: 1.6; /* Spacing between lines */
+  color: var(--text-primary); /* Use primary text color variable */
+  max-height: 40vh; /* Limit height */
+  overflow-y: auto; /* Add scrollbar if needed */
+  background-color: var(--bg-primary); /* Use primary bg for text area? Or a slightly different shade? */
+  padding: 15px; /* Padding inside the text area */
+  border-radius: 5px; /* Rounded corners */
+  border: 1px solid var(--border-primary); /* Use primary border variable */
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease; /* Smooth transitions */
+}
+/* Slightly different background for text areas in dark mode for contrast maybe? */
+body.dark-mode .transcript-area, body.dark-mode .resources-area {
+    background-color: #1f1f34; /* Slightly different dark shade */
 }
 
-/* --- Styles for the File/URL Upload Mode Switcher --- */
+
+/* --- Styles for the NEW Upload Modal! --- The Popup! Using Variables! --- */
+.modal-overlay {
+  position: fixed; /* Fixed on screen */
+  top: 0; left: 0; right: 0; bottom: 0; /* Cover everything */
+  /* Conditional background using CSS var fallback! */
+  background-color: var(--overlay-bg, rgba(75, 65, 95, 0.6)); /* Default light mode overlay */
+  display: flex; align-items: center; justify-content: center; /* Center the content */
+  z-index: 1000; /* High z-index! */
+  backdrop-filter: blur(3px); /* Nice blur effect! */
+}
+body.dark-mode .modal-overlay {
+    --overlay-bg: rgba(26, 26, 46, 0.7); /* Dark mode overlay color */
+}
+
+/* The modal content box itself! */
+.modal-content {
+  background-color: var(--bg-surface); /* Use surface background */
+  padding: 30px 40px; /* Internal spacing */
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0 5px 25px var(--shadow-primary); /* Use shadow variable */
+  position: relative; /* For close button positioning */
+  max-width: 500px; /* Max width */
+  width: 90%; /* Responsive width */
+  z-index: 1001; /* Above overlay */
+  max-height: 85vh; /* Max height */
+  overflow-y: auto; /* Allow scrolling inside */
+  transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Smooth theme transition */
+}
+
+/* The 'X' close button! */
+.modal-close-button {
+  position: absolute; top: 10px; right: 15px; background: none; border: none;
+  font-size: 1.8em; font-weight: bold;
+  color: var(--text-secondary); /* Use secondary text color */
+  cursor: pointer; padding: 0; line-height: 1; transition: color 0.2s ease;
+}
+.modal-close-button:hover {
+  color: var(--accent-primary); /* Use primary accent on hover */
+}
+
+/* Modal Title! */
+.modal-title {
+  margin-top: 0; margin-bottom: 25px;
+  color: var(--accent-primary); /* Use primary accent color */
+  text-align: center; font-size: 1.5em;
+}
+
+/* Styles for the FileUpload component *when it's inside the modal* */
+.modal-content .sidebar-file-upload { border-top: none; padding: 0; margin-top: 0; }
+.modal-content .sidebar-file-upload h4 { display: none; /* Hide sub-header */ }
+
+
+/* --- Upload Mode Switcher Styles --- Themed! Using Variables! --- */
 .upload-mode-switcher {
-  display: flex; /* Put buttons side-by-side */
-  margin-bottom: 15px; /* Space below the switcher */
-  border-radius: 6px; /* Rounded container */
-  overflow: hidden; /* Clip corners */
-  border: 1px solid var(--primary-purple); /* Border around switcher */
+  display: flex; justify-content: center; margin-bottom: 20px; gap: 10px; /* Spaced buttons */
 }
-
+/* Default button state */
 .upload-mode-switcher button {
-  flex-grow: 1; /* Make buttons share space equally */
-  padding: 8px 5px; /* Padding inside buttons */
-  border: none; /* Remove default button border */
-  background-color: var(--white); /* Default background */
-  color: var(--secondary-purple); /* Default text color */
-  cursor: pointer;
-  font-size: 0.9em;
-  font-weight: 500;
-  transition: background-color 0.2s ease, color 0.2s ease; /* Smooth transition */
-  border-radius: 0; /* No rounded corners on individual buttons */
+  padding: 6px 12px; /* Smaller padding */
+  border: 1px solid var(--border-primary); /* Use border variable */
+  background-color: var(--bg-surface); /* Use surface background */
+  color: var(--text-secondary); /* Use secondary text color */
+  cursor: pointer; font-size: 0.85em; font-weight: 500; border-radius: 5px;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease; /* Smooth! */
 }
-
-.upload-mode-switcher button:not(:last-child) {
-  border-right: 1px solid var(--primary-purple); /* Separator line between buttons */
-}
-
+/* Hover state */
 .upload-mode-switcher button:hover {
-  background-color: var(--primary-purple); /* Hover background */
-  color: var(--dark-text);
+  background-color: var(--accent-tertiary); /* Use tertiary accent */
+  border-color: var(--accent-secondary); /* Use secondary accent */
+  color: var(--text-primary); /* Use primary text */
 }
-
+/* Dark mode hover adjustments */
+body.dark-mode .upload-mode-switcher button:hover {
+   background-color: #3a3a4e; /* Darker surface */
+   border-color: var(--accent-secondary); /* Keep border accent */
+   color: var(--text-primary); /* Keep light text */
+}
+/* Active state */
 .upload-mode-switcher button.active {
-  background-color: var(--secondary-purple); /* Active tab background */
-  color: var(--white); /* Active tab text color */
-  cursor: default; /* No pointer on active tab */
+  background-color: var(--accent-secondary); /* Use secondary accent */
+  color: var(--text-on-accent); /* Use text-on-accent */
+  border-color: var(--accent-secondary); /* Match background */
+  cursor: default; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
 }
+/* Dark mode active adjustments */
+body.dark-mode .upload-mode-switcher button.active {
+    background-color: var(--accent-primary); /* Use primary accent */
+    border-color: var(--accent-primary); /* Match background */
+    color: var(--text-on-accent); /* Text still okay */
+}
+/* Disabled state */
 .upload-mode-switcher button:disabled {
-    background-color: var(--light-bg);
-    color: var(--primary-purple);
-    cursor: not-allowed;
-    opacity: 0.7;
+    background-color: transparent; /* Clearer disabled look */
+    color: var(--border-primary); /* Faded text using border color */
+    border-color: var(--border-primary); /* Match text color */
+    cursor: not-allowed; opacity: 0.6;
 }
 
-
-/* --- Styles for the area containing the input (file or url) --- */
-.upload-input-area {
-  margin-bottom: 15px; /* Space below the input area, above the main button */
-  min-height: 50px; /* Give it some minimum height so layout doesn't jump too much */
-  /* Add transition? Maybe not needed */
-}
-
-/* Styles specific to the File input section (if needed) */
-.file-input-section p { /* Style for the "Selected: filename" text */
-    font-size: 0.8em;
-    margin: 8px 0 0 0;
-    color: var(--secondary-purple);
-    overflow-wrap: break-word;
-    text-align: center;
-}
-
-/* Styles specific to the URL input section */
+/* Upload Input Area (File or URL) */
+.upload-input-area { margin-bottom: 20px; min-height: 50px; }
+/* File Input 'Selected:' Text */
+.file-input-section p { font-size: 0.8em; margin: 8px 0 0 0; color: var(--text-secondary); overflow-wrap: break-word; text-align: center; }
+/* URL Input Field */
 .url-input-section .url-input-field {
-  width: 100%; /* Make input take full width */
-  padding: 8px 10px; /* Padding inside input */
-  border: 1px solid var(--border-color); /* Border color */
-  border-radius: 4px; /* Rounded corners */
-  font-size: 0.95em;
-  color: var(--dark-text);
-  background-color: #fdfcff; /* Slightly off-white background */
-  box-sizing: border-box; /* Include padding/border in width calculation! */
+  width: 100%; padding: 8px 10px; border-radius: 4px; font-size: 0.95em; box-sizing: border-box;
+  border: 1px solid var(--border-primary); /* Use border variable */
+  background-color: var(--bg-primary); /* Use primary background */
+  color: var(--text-primary); /* Use primary text */
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease; /* Smooth theme change */
 }
 .url-input-section .url-input-field:focus {
-    outline: none; /* Remove default focus outline */
-    border-color: var(--secondary-purple); /* Highlight border on focus */
-    box-shadow: 0 0 0 2px rgba(149, 117, 205, 0.2); /* Add subtle glow on focus */
+    outline: none; /* Remove default ugly outline */
+    border-color: var(--accent-secondary); /* Use secondary accent for focus border */
+    box-shadow: 0 0 0 2px var(--accent-tertiary); /* Use tertiary accent for subtle glow */
+}
+/* Dark mode focus adjustment for URL input */
+body.dark-mode .url-input-section .url-input-field:focus {
+    border-color: var(--accent-secondary); /* Use dark mode secondary accent */
+    box-shadow: 0 0 0 2px rgba(161, 136, 218, 0.3); /* Use the primary accent color with alpha for glow */
 }
 
-/* Style the MAIN upload button if needed (might conflict with existing button styles) */
-.main-upload-button {
-   /* Keep or adjust existing styles */
-   display: block;
-   width: 100%;
-   padding: 10px 15px; /* Maybe slightly larger main button? */
-   background-color: var(--accent-purple);
-   color: var(--white);
-   border: none;
-   border-radius: 6px;
-   cursor: pointer;
-   font-weight: 500;
-   font-size: 1em;
-   transition: background-color 0.2s ease, opacity 0.2s ease;
-   margin-top: 5px;
+/* Main Upload/Submit Button (inside modal) */
+.modal-content .main-upload-button {
+   display: block; width: 100%; padding: 10px 15px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 1em; transition: background-color 0.2s ease, opacity 0.2s ease; margin-top: 5px;
+   background-color: var(--accent-primary); /* Use primary accent */
+   color: var(--text-on-accent); /* Use text-on-accent */
 }
-.main-upload-button:hover {
-   background-color: var(--secondary-purple);
+.modal-content .main-upload-button:hover {
+   background-color: var(--accent-secondary); /* Use secondary accent */
 }
-.main-upload-button:disabled {
-   background-color: var(--primary-purple);
-   opacity: 0.7;
-   cursor: not-allowed;
+.modal-content .main-upload-button:disabled {
+   background-color: var(--accent-tertiary); /* Use tertiary accent */
+   opacity: 0.7; cursor: not-allowed;
 }
+/* --- End Modal Styles --- */
 
-/* --- Scrollbar Styling (Optional, but nice!) --- Only works in Webkit browsers (Chrome, Safari, Edge) --- */
-::-webkit-scrollbar {
-  width: 8px; /* Width of vertical scrollbar */
-  height: 8px; /* Height of horizontal scrollbar */
-}
+
+/* --- Scrollbar Styling --- Using Variables! --- Optional, but nice! --- */
+::-webkit-scrollbar { width: 8px; height: 8px; /* Size */ }
 ::-webkit-scrollbar-track {
-  background: var(--light-bg); /* Background of the track */
+  background: var(--scroll-track); /* Use scroll track variable */
   border-radius: 10px; /* Rounded track */
 }
 ::-webkit-scrollbar-thumb {
-  background-color: var(--primary-purple); /* Color of the draggable thumb! */
+  background-color: var(--scroll-thumb); /* Use scroll thumb variable */
   border-radius: 10px; /* Rounded thumb */
-  border: 2px solid var(--light-bg); /* Creates padding around thumb */
+  border: 2px solid var(--scroll-track); /* Padding effect using track color */
 }
 ::-webkit-scrollbar-thumb:hover {
-  background-color: var(--secondary-purple); /* Darker thumb on hover! */
+  background-color: var(--scroll-thumb-hover); /* Use scroll thumb hover variable */
 }
 /* --- End Scrollbar Styling --- */
+
+
+/* --- Theme Toggle Button Style --- The Sun/Moon button! ☀️/🌙 --- */
+.theme-toggle-button {
+    position: fixed; /* Always visible, stays put */
+    top: 15px; /* Distance from top */
+    right: 20px; /* Distance from right */
+    padding: 8px 10px; /* Padding inside */
+    background-color: var(--bg-surface); /* Use surface background */
+    color: var(--text-primary); /* Use primary text */
+    border: 1px solid var(--border-primary); /* Use primary border */
+    border-radius: 50%; /* Make it round! Cute! */
+    cursor: pointer; /* Clicky hand! */
+    font-size: 1.2em; /* Make emoji slightly larger */
+    line-height: 1; /* Prevent extra vertical space */
+    z-index: 1050; /* Keep it above most things, but maybe below modal overlay? */
+    box-shadow: 0 2px 5px var(--shadow-primary); /* Subtle shadow */
+    transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease; /* Smooth transitions! */
+}
+.theme-toggle-button:hover {
+    transform: scale(1.1); /* Get slightly bigger on hover! */
+    box-shadow: 0 4px 8px var(--shadow-primary); /* Slightly stronger shadow on hover */
+}
+/* --- End Theme Toggle Button Style --- */
