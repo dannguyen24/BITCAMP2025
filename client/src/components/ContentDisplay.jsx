@@ -1,7 +1,7 @@
 import React, { useState } from 'react'; // Need useState for collapsible sections!
 
 // --- Sub-Component for Collapsible Section --- Helper! ---
-// This makes managing the collapsed state easier for each transcript. So tidy!
+// This makes managing the collapsed state easier for each transcript..
 function CollapsibleSection({ title, children, initiallyCollapsed = true }) {
   // State within THIS component to track if it's collapsed! Starts collapsed by default.
   const [isCollapsed, setIsCollapsed] = useState(initiallyCollapsed);

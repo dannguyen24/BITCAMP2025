@@ -1,4 +1,4 @@
-/* Let's get some nice fonts! Poppins is pretty cool! Downloaded from Google Fonts! */
+/* Poppins is pretty cool! */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
 
 /* --- Theme Variables --- Our Color Palette! Organized and Semantic! 🎨 --- */
@@ -70,12 +70,12 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease; /* Smooth theme transition! Nice! */
 }
 
-/* --- Main App Layout --- Flexbox Power! Using GAP for spacing! --- */
+/* --- Main App Layout --- Using GAP for spacing! --- */
 .app-container {
   display: flex; /* Side-by-side layout magic! */
   height: 100vh; /* Full viewport height! */
   overflow: hidden; /* Prevent scrollbars on the container itself */
-  /* --- Use GAP for spacing between sidebar and content --- This is the fix! --- */
+  /* --- Use GAP for spacing between sidebar and content */
   gap: 15px; /* Adjust this value for desired spacing! */
 }
 
@@ -126,7 +126,7 @@ body.dark-mode .sidebar-border-handle:hover { /* background-color: rgba(255, 255
 /* --- End Invisible Handle Styles --- */
 
 
-/* --- Content Display Area Styles --- Where the good stuff is! Using Variables! --- */
+/* --- Content Display Area Styles --- Using Variables! --- */
 .content-display {
   flex-grow: 1; /* Takes up remaining space */
   /* === Slightly Increased Padding === */

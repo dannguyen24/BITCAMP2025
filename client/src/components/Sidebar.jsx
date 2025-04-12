@@ -18,7 +18,7 @@ const Sidebar = React.forwardRef(({ structure, onSelectTopic, selectedItem, styl
       {/* Invisible handle for resizing - still needs to be here! */}
       <div className="sidebar-border-handle" onMouseDown={onResizeMouseDown} />
 
-      {/* Title Area with Upload Button (Unchanged) */}
+      {/* Title Area with Upload Button */}
       <div className="sidebar-title-area">
         <h2>My Lectures! ✨</h2>
         <button onClick={onOpenUploadModal} className="upload-modal-button" title="Upload New Lecture">
