@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+import requests
 from flask_cors import CORS
 #Library for .env variable access
 from dotenv import load_dotenv
@@ -12,24 +13,33 @@ import assemblyai as aai
 import yt_dlp
 from config.db import db
 from datetime import datetime
-
-
-# Import database configuration
-
+#Regex to search for pattern
+import re
+#import google generative
+import google.generativeai as gen_ai
 
 #Define config for logging
 logging.basicConfig(level=logging.INFO)
 
-
 app = Flask(__name__)
 #Allow connection with frontend
 CORS(app, origins=['http://localhost:5173'])
+
 load_dotenv()
+
 #create an audio folder if not exist
 os.makedirs("audio", exist_ok=True)
 
-# API Token for 
+#Added Generative AI agent
+gen_ai.configure(api_key=os.getenv("GEN_AI"))
+
+# API Token for Assembly AI
 aai.settings.api_key = os.getenv("ASSEMBLYAI_API_KEY")
+
+#Google API Key for web searching
+GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
+#Something ..
+GOOGLE_CSE_ID = os.getenv('GOOGLE_CSE_ID')
 
 # Create a transcriber object.
 transcriber = aai.Transcriber()
@@ -73,65 +83,8 @@ def test():
         return jsonify(doc), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-    
-    
-#####SAI's CODE
 
-GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
-GOOGLE_CSE_ID = os.getenv('GOOGLE_CSE_ID')
-
-
-def google_search(query, site_restrict=None):
-    params = {
-        'key': GOOGLE_API_KEY,
-        'cx': GOOGLE_CSE_ID,
-        'q': query,
-        'num': 1  # Limit to 1 result
-    }
-    if site_restrict:
-        params['siteSearch'] = site_restrict
-
-    response = request.get('https://www.googleapis.com/customsearch/v1', params=params)
-    if response.status_code == 200:
-        return response.json()
-    else:
-        logging.error(f"Google Search API Error: {response.status_code}")
-        return {}
-
-@app.route("/search_resources", methods=["GET"])
-def search_resources():
-    topic = request.args.get('topic')
-
-    if not topic:
-        return jsonify({"error": "Missing topic parameter"}), 400
-
-    resources = []
-
-    # Fetch 1 YouTube video
-    youtube_result = google_search(topic, site_restrict="youtube.com")
-    if youtube_result.get('items'):
-        video_item = youtube_result['items'][0]
-        resources.append({
-            "type": "video",
-            "title": video_item['title'],
-            "link": video_item['link'],
-        })
-
-    # Fetch 1 non-YouTube result
-    non_video_result = google_search(topic)
-    if non_video_result.get('items'):
-        for item in non_video_result['items']:
-            if "youtube.com" not in item['link']:
-                resources.append({
-                    "type": "article",
-                    "title": item['title'],
-                    "link": item['link'],
-                })
-                break
-
-    return jsonify({"resources": resources})
-
-
+#Download audio from the video uploaded
 def download_audio(video_url, output_path):
     ydl_opts = {
         'format': 'bestaudio/best',
@@ -143,9 +96,8 @@ def download_audio(video_url, output_path):
         }],
     }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        ydl.download([video_url])
-        
-        
+        ydl.download([video_url])   
+     
 #Transcribe the data and remove it after get the transcription
 def transcribe(audio_path):
     try:
@@ -155,27 +107,24 @@ def transcribe(audio_path):
         #Delete the audio file from the folder
         clean_up(audio_path + ".wav")
         
+        #The recommendation given by Google AI
+        content = extract_keywords(transcript.text)
+        # result_content = {
+        #     "subject": subject,
+        #     "class_name": class_name,
+        #     "topic": topic,
+        #     "subtopics": subtopics
+        # }
         #Add the transcription into mongoDB
         document = {
-            'uploadDate': datetime(),
-            'topicsCovered': [
-                "Singly Linked Lists",
-                "Node Structure",
-                "Head Pointer",
-                "Traversal"
-            ],
+            'uploadDate': datetime.now(),
+            'topicsCovered': content["subtopics"],
             'summary': "Introduced the fundamental concepts of singly linked lists, including node creation, head pointers, and basic list traversal.",
-            'structuredResources': [
-                {
-                    "topic": "Singly Linked Lists",
-                    "googleLink": "https://www.geeksforgeeks.org/linked-list-set-1-introduction/",
-                    "youtubeLink": "https://www.youtube.com/watch?v=njTh_OvY_zo"
-                }
-            ],
+            'structuredResources': search_resources(content["subtopics"]),
             'transcript': transcript.text,
-            'subject': "Math",
-            'class': "Calculus I",
-            'topic': ""
+            'subject': content["subject"],
+            'class': content["class"],
+            'topic': content["topic"],
         }
         result = db.Documents.insert_one(document)
         logging.info(f"Inserted document ID: {result.inserted_id}")
@@ -194,15 +143,114 @@ def transcribe(audio_path):
         logging.error(f"An error occurred: {e}")
         return jsonify({"error": str(e)}), 500
 
-
+#Delete the audio file from the audio folder
 def clean_up(file_path):
     if os.path.exists(file_path):
         os.remove(file_path)
         
+#####SAI's CODE=================Start=========================================
 
-@app.route("/extract_keywords", methods=["GET"])
-def extract_keywords():
-    return "extract_keywords"
+def google_search(query, site_restrict=None):
+    params = {
+        'key': GOOGLE_API_KEY,
+        'cx': GOOGLE_CSE_ID,
+        'q': query,
+        'num': 1  # Limit to 1 result
+    }
+    if site_restrict:
+        params['siteSearch'] = site_restrict
+
+    response = requests.get('https://www.googleapis.com/customsearch/v1', params=params)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        logging.error(f"Google Search API Error: {response.status_code}")
+        return {}
+
+def search_resources(subtopics):
+
+    # final_resources = {}
+    topic_resources = []
+    # subtopics = ["Singly Linked Lists", "Node Structure", "Head Pointer", "Traversal"]
+    for topic in subtopics:
+        
+        youtube = ""
+        google = ""
+        # 1 YouTube video
+        youtube_result = google_search(topic, site_restrict="youtube.com")
+        if youtube_result.get('items'):
+            video_item = youtube_result['items'][0]
+            youtube = video_item['link']
+         
+
+        # 1 non-YouTube resource
+        non_video_result = google_search(topic)
+        if non_video_result.get('items'):
+            for item in non_video_result['items']:
+                if "youtube.com" not in item['link']:
+                    google = item['link']
+                  
+                    break
+        topic_resources.append({
+            "topic": topic,
+            "googleLink": google,
+            "youtubeLink": youtube,
+        })
+      
+
+    return topic_resources
+
+#####SAI's CODE=================End=========================================
+
+
+def extract_cleaned_value(pattern, text):
+    match = re.search(pattern, text)
+    if match:
+        return match.group(1).replace("*", "").strip()
+    return None
+
+def extract_keywords(transcription):
+    
+    prompt = f'''
+    You are an AI assistant helping a student break down a lecture note. Based on the content below:
+
+        --- BEGIN LECTURE NOTE ---
+        {transcription}
+        --- END LECTURE NOTE ---
+
+        Please output the following sections clearly:
+
+        1. Subject: (umbrella subject that this student is studying (ex. History, Math, etc.) - only show most likely)
+        2. Class: (the class of the subject the student is studying (ex. Calculus I, Calculus II, Data Structures) - only show most likely)
+        3. Topic: Define the overarching topic (keyword)
+        4. Sub-Topics: the sub-topics covered in a lecture [in a list seperated by ,]
+        5. Summary: a concise and insightful one-sentence summary of the lecture
+
+        Example:
+        1. Subject: Computer Science
+        2. Class: Data Structure
+        3. Topic: Linked Lists
+        4. Sub-Topics: Singly Linked Lists, Node Structure, Head Pointer, Traversal
+    '''
+    model = gen_ai.GenerativeModel(model_name=os.getenv("MODEL_NAME"))
+    response = model.generate_content(prompt)
+    output_text = response.text
+    
+    subject = extract_cleaned_value(r"Subject:\s*(.+)", output_text)
+    class_name = extract_cleaned_value(r"Class:\s*(.+)", output_text)
+    topic = extract_cleaned_value(r"Topic:\s*(.+)", output_text)
+    subtopic_raw = extract_cleaned_value(r"Sub-Topics:\s*(.+)", output_text)
+
+    # Convert sub-topics into list of strings
+    subtopics = [s.strip() for s in subtopic_raw.split(",")] if subtopic_raw else []
+    
+    result_content = {
+        "subject": subject,
+        "class": class_name,
+        "topic": topic,
+        "subtopics": subtopics
+    }
+    return result_content
 
 if __name__ == "__main__":
     print("Connecting to MongoDB...")
