@@ -111,15 +111,15 @@ def transcribe(audio_path):
         content = extract_keywords(transcript.text)
         # result_content = {
         #     "subject": subject,
-        #     "class_name": class_name,
+        #     "class": class_name,
         #     "topic": topic,
-        #     "subtopics": subtopics
+        #     "subtopics": subtopics,
+        #     "summary": summary
         # }
-        #Add the transcription into mongoDB
         document = {
             'uploadDate': datetime.now(),
             'topicsCovered': content["subtopics"],
-            'summary': "Introduced the fundamental concepts of singly linked lists, including node creation, head pointers, and basic list traversal.",
+            'summary': content["summary"],
             'structuredResources': search_resources(content["subtopics"]),
             'transcript': transcript.text,
             'subject': content["subject"],
@@ -240,6 +240,8 @@ def extract_keywords(transcription):
     class_name = extract_cleaned_value(r"Class:\s*(.+)", output_text)
     topic = extract_cleaned_value(r"Topic:\s*(.+)", output_text)
     subtopic_raw = extract_cleaned_value(r"Sub-Topics:\s*(.+)", output_text)
+    summary = extract_cleaned_value(r"Summary:\s*(.+)", output_text)
+
 
     # Convert sub-topics into list of strings
     subtopics = [s.strip() for s in subtopic_raw.split(",")] if subtopic_raw else []
@@ -248,7 +250,8 @@ def extract_keywords(transcription):
         "subject": subject,
         "class": class_name,
         "topic": topic,
-        "subtopics": subtopics
+        "subtopics": subtopics,
+        "summary": summary
     }
     return result_content
 
