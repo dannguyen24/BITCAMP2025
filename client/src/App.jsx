@@ -6,10 +6,7 @@ import ContentDisplay from './components/ContentDisplay'; // Where the stuff sho
 import UploadModal from './components/UploadModal'; // The popup modal for uploads.
 import './App.css'; // Styles, including dark mode. Very important.
 
-// --- NO MORE MOCK DATA! We're connecting to the real deal! ---
-
-
-// === App Component === The Grand Central Station! Ready for Backend Data! ===
+// === App Component === Handling backend data transformation! ===
 function App() {
   // --- State Definitions (Theme, Modal, Resizing) ---
   const [theme, setTheme] = useState('dark'); // Defaulting to dark mode.
@@ -21,8 +18,8 @@ function App() {
   const appContainerRef = useRef(null);
   const sidebarRef = useRef(null);
 
-  // --- Core Application State --- Initialize as empty/null, waiting for backend data! ---
-  const [folderStructure, setFolderStructure] = useState({}); // Start empty! Will fetch on load.
+  // --- Core Application State ---
+  const [folderStructure, setFolderStructure] = useState({}); // Start empty! Will build on fetch.
   const [selectedItem, setSelectedItem] = useState(null); // { subject, class, topic } or null.
   const [currentContent, setCurrentContent] = useState(null); // Expects Array of note objects or null.
   const [isLoading, setIsLoading] = useState(false); // General loading state.
@@ -31,42 +28,80 @@ function App() {
   // --- End State Definitions ---
 
 
-  // --- Theme Management Logic  ---
+  // --- Theme Management Logic --- (Unchanged) ---
   useEffect(() => { /* ... initial theme check ... */ }, []);
   useEffect(() => { document.body.classList.toggle('dark-mode', theme === 'dark'); try {localStorage.setItem('lectureAppTheme', theme);} catch(e){} }, [theme]);
   const toggleTheme = useCallback(() => { setTheme(prev => (prev === 'light' ? 'dark' : 'light')); }, []);
 
-  // --- Modal Logic  ---
+  // --- Modal Logic --- (Unchanged) ---
   const openModal = useCallback(() => { setIsModalOpen(true); }, []);
   const closeModal = useCallback(() => { setIsModalOpen(false); }, []);
 
-  // --- Resizing Logic --- (persistent listeners approach) ---
+  // --- Resizing Logic --- (Unchanged - persistent listeners approach) ---
   const handleMouseMove = useCallback((e) => { if(!isResizingRef.current) return; let nw=e.clientX; nw=Math.max(200,Math.min(600,nw)); setSidebarWidth(nw);}, []);
   const handleMouseUp = useCallback(() => { if(isResizingRef.current){setIsResizing(false); document.body.style.userSelect=''; document.body.style.cursor='';}}, []);
   useEffect(() => { window.addEventListener('mousemove', handleMouseMove); window.addEventListener('mouseup', handleMouseUp); return () => { window.removeEventListener('mousemove', handleMouseMove); window.removeEventListener('mouseup', handleMouseUp); }; }, [handleMouseMove, handleMouseUp]);
   const handleMouseDown = useCallback((e) => { e.preventDefault(); flushSync(() => { setIsResizing(true); }); document.body.style.userSelect='none'; document.body.style.cursor='col-resize';}, []);
 
 
-  // --- Data Fetching & Topic Selection Logic --- *** RESTORED API CALLS *** ---
+  // --- Data Fetching & Topic Selection Logic --- *** fetchStructure MODIFIED *** ---
 
-  // Fetches the 3-level folder structure from the backend API. Also used for refresh!
+  // Fetches data from backend and TRANSFORMS it into the 3-level folder structure.
   const fetchStructure = useCallback(async (calledFrom = 'unknown') => {
-    console.log(`Fetching structure from backend... (Called from: ${calledFrom})`);
-    setIsLoading(true); setError(null); // Set loading, clear errors.
+    console.log(`Fetching raw data from /transcripts...`);
+    setIsLoading(true); setError(null);
     try {
-      // --- ACTUAL API CALL for Structure --- Ensure URL is correct! ---
+      // --- Fetch the data (expecting an array of notes) ---
       // TODO: Replace '/api/structure' with `${import.meta.env.VITE_API_BASE_URL}/api/structure` or similar env var.
-      const response = await fetch('/api/structure');
+      const response = await fetch('http://127.0.0.1:5000/transcripts');
       if (!response.ok) {
           let errorMsg = `HTTP error! Status: ${response.status}`;
            try { const errData = await response.json(); errorMsg = errData.error || errData.message || errorMsg; } catch(e) { /* Ignore if not JSON */ }
            throw new Error(errorMsg);
        }
-      const data = await response.json(); // Get the JSON data!
-      console.log("Received structure data:", data);
-      setFolderStructure(data || {}); // Update state. Handle null response.
+      const flatNoteList = await response.json(); // Expecting an ARRAY like [{ subject, class, topic, ...}, ...]
+      console.log("Received raw data from http://127.0.0.1:5000/transcripts:", flatNoteList);
+
+      // --- !!! DATA TRANSFORMATION LOGIC !!! ---
+      // Check if we actually got an array
+      if (!Array.isArray(flatNoteList)) {
+          console.error("http://127.0.0.1:5000/transcripts/ did not return an array!", flatNoteList);
+          throw new Error("Invalid structure data format received from server.");
+      }
+
+      // Build the required nested structure
+      const nestedStructure = {};
+      flatNoteList.forEach(note => {
+          // --- IMPORTANT: Use the CORRECT keys from the backend response ---
+          // Adjust these ('subject', 'class', 'topic') if backend uses different names like 'nameClass'
+          const subject = note.subject;
+          const className = note.class; // Assuming backend sends 'class' key
+          const topicName = note.topic; // Assuming backend sends 'topic' key
+
+          // Ensure all parts exist before adding to structure
+          if (subject && className && topicName) {
+              // Create subject level if it doesn't exist
+              if (!nestedStructure[subject]) {
+                  nestedStructure[subject] = {};
+              }
+              // Create class level if it doesn't exist
+              if (!nestedStructure[subject][className]) {
+                  nestedStructure[subject][className] = {};
+              }
+              // Add topic (empty object signifies its existence in the hierarchy)
+              nestedStructure[subject][className][topicName] = {};
+          } else {
+              // Log a warning if a note is missing necessary fields for structuring
+              console.warn("Skipping note in structure due to missing subject/class/topic:", note);
+          }
+      });
+      // --- !!! END TRANSFORMATION LOGIC !!! ---
+
+      console.log("Transformed nested structure for Sidebar:", nestedStructure);
+      setFolderStructure(nestedStructure || {}); // Update state with the *nested* structure!
+
     } catch (err) {
-      console.error("Fetch structure failed!", err); // Log the error!
+      console.error("Fetch or transform structure failed!", err); // Log the error!
       setError(`Couldn't load lecture structure: ${err.message}.`); // Tell the user!
       setFolderStructure({}); // Reset structure on error!
     } finally {
@@ -74,177 +109,75 @@ function App() {
     }
   }, []); // Stable function identity.
 
-  // Initial fetch on mount - Fetch the structure when app loads.
+  // Initial fetch on mount - Runs the modified fetchStructure.
   useEffect(() => {
-    console.log("App mounted. Fetching initial structure from backend.");
-    fetchStructure('initialMount'); // *** RE-ENABLED ***
+    console.log("App mounted. Fetching initial structure data from backend.");
+    fetchStructure('initialMount');
   }, [fetchStructure]); // Dependency array includes fetchStructure
 
-  // Fetch content effect - Fetches notes (array) when 3-level selection changes.
+  // Fetch content effect - Assumes /api/content returns the CORRECT array format needed by ContentDisplay.
   useEffect(() => {
-    // If selection is incomplete, clear content and don't fetch.
-    if (!selectedItem || !selectedItem.subject || !selectedItem.class || !selectedItem.topic) {
-      setCurrentContent(null);
-      return;
-    }
-    // Define the async function to fetch content.
+    if (!selectedItem || !selectedItem.subject || !selectedItem.class || !selectedItem.topic) { setCurrentContent(null); return; }
     const fetchContent = async () => {
-      console.log("Selection changed to:", selectedItem, ". Fetching content array from backend...");
-      setIsLoading(true); setError(null); setCurrentContent(null); // Set loading, clear error/content.
+      console.log("Selection changed. Fetching content for:", selectedItem);
+      setIsLoading(true); setError(null); setCurrentContent(null);
       try {
-        const { subject, class: className, topic } = selectedItem; // Use 'className' alias.
-        // --- ACTUAL API CALL for Content --- Build URL with all 3 params! Check endpoint! ---
-        // TODO: Replace base URL with env var like `${import.meta.env.VITE_API_BASE_URL}/api/content...`
-        const apiUrl = `/api/content?subject=${encodeURIComponent(subject)}&class=${encodeURIComponent(className)}&topic=${encodeURIComponent(topic)}`;
+        const { subject, class: className, topic } = selectedItem;
+        // TODO: Replace base URL with env var
+        const apiUrl = `/content?subject=${encodeURIComponent(subject)}&class=${encodeURIComponent(className)}&topic=${encodeURIComponent(topic)}`;
         console.log("Fetching content from:", apiUrl);
         const response = await fetch(apiUrl);
-        if (!response.ok) {
-             let errorMsg = `HTTP error! Status: ${response.status}`;
-             try { const errData = await response.json(); errorMsg = errData.error || errData.message || errorMsg; } catch(e) { /* Ignore */ }
-             throw new Error(`${errorMsg} for ${subject}/${className}/${topic}`);
-         }
-        // *** EXPECTING AN ARRAY of note objects now! ***
+        if (!response.ok) { throw new Error(`HTTP ${response.status}`); }
         const data = await response.json();
-        console.log("Received content data (expecting array):", data);
-        if (!Array.isArray(data)) { throw new Error("Received invalid data format from server."); } // Validate!
-        // Add mock _id if backend doesn't send it yet (REMOVE LATER)
-        const contentWithIds = data.map((item, index) => ({ ...item, _id: item._id || `temp_id_${Date.now()}_${index}` }));
-        setCurrentContent(contentWithIds); // Update state with the array!
+        if (!Array.isArray(data)) { throw new Error("Invalid content data format"); }
+        console.log("Received content data:", data);
+        setCurrentContent(data); // Update state with the array!
       } catch (err) {
-        console.error("Fetch content failed.", err); // Log error
-        setError(`Couldn't load content: ${err.message}`); // Set error message for UI
-        setCurrentContent(null); // Clear content on error.
-      } finally {
-        setIsLoading(false); // Done loading content.
-      }
+        console.error("Fetch content failed.", err);
+        setError(`Couldn't load content: ${err.message}`);
+        setCurrentContent(null);
+      } finally { setIsLoading(false); }
     };
-    fetchContent(); // Call the fetch function!
-  }, [selectedItem]); // Dependency: run when selectedItem changes!
+    fetchContent();
+  }, [selectedItem]);
 
-  // Handle topic clicks from Sidebar - Sets the 3-level selectedItem state.
-  const handleSelectTopic = useCallback((subject, className, topic) => {
-    console.log(`Topic selected: ${subject}/${className}/${topic}`);
-    const newItem = { subject, class: className, topic }; // Use 'class', 'topic' for state keys
-    if (selectedItem?.subject !== subject || selectedItem?.class !== className || selectedItem?.topic !== topic) {
-      setSelectedItem(newItem); // Update state, triggers content fetch effect!
-    } else {
-      console.log("...same topic selected."); // Log if same topic clicked.
-    }
-  }, [selectedItem]); // Depends on selectedItem to check against current selection.
+  // Handle topic clicks from Sidebar (Unchanged - uses internal state keys).
+  const handleSelectTopic = useCallback((subject, className, topic) => { console.log(`Topic selected: ${subject}/${className}/${topic}`); const newItem={subject, class: className, topic}; if(selectedItem?.subject!==subject || selectedItem?.class !== className || selectedItem?.topic !== topic){setSelectedItem(newItem);} else { console.log("...same topic selected."); }}, [selectedItem]);
 
 
-  // --- !!! DELETE HANDLERS --- Now making REAL API calls! ---
-
-  // Generic Delete Function (Helper) - Contains confirmation and API call logic.
+  // --- Delete Handlers --- (Ensure URLs match backend!)
+  // Generic Delete Function (Helper)
   const performDelete = async (url, itemDescription, successCallback) => {
-    // Confirmation Dialog - VERY IMPORTANT! Stops accidental clicks!
-    if (!window.confirm(`Are you sure you want to delete "${itemDescription}"? This action cannot be undone.`)) {
-      console.log("Delete cancelled by user for:", itemDescription);
-      return; // Stop right here if they click cancel!
-    }
-
+    if (!window.confirm(`Are you sure you want to delete "${itemDescription}"? This action cannot be undone.`)) { return; }
     console.log(`Attempting to DELETE: ${url}`);
-    setIsDeleting(true); // Set specific deleting state for visual feedback!
-    setError(null); // Clear previous errors.
+    setIsDeleting(true); setError(null);
     try {
-      // --- ACTUAL API CALL --- Make the DELETE request! ---
-      // TODO: Prepend with env var base URL if needed: `${import.meta.env.VITE_API_BASE_URL}${url}`
+      // TODO: Prepend base URL from env var if needed
       const response = await fetch(url, { method: 'DELETE' });
-
-      // Check if the backend said "Okay!"
       if (!response.ok) {
-        // Try to get a specific error message from the backend response body.
-        let errorMsg = `HTTP error! Status: ${response.status}`;
-        try { const errData = await response.json(); errorMsg = errData.error || errData.message || errorMsg; } catch (e) {/* Ignore if response wasn't JSON */}
-        throw new Error(errorMsg); // Throw an error to be caught below.
+          let errorMsg = `HTTP error! Status: ${response.status}`;
+          try { const errData = await response.json(); errorMsg = errData.error || errData.message || errorMsg; } catch (e) {}
+          throw new Error(errorMsg);
       }
-
-      // If we got here, it worked!
       console.log(`Successfully deleted: ${itemDescription}`);
-      alert(`"${itemDescription}" deleted successfully.`); // Simple feedback for the user.
-
-      // Run the success callback function passed in (usually to refresh UI state).
-      if (successCallback) {
-        successCallback();
-      }
-
+      alert(`"${itemDescription}" deleted successfully.`);
+      if (successCallback) { successCallback(); }
     } catch (err) {
-      // Uh oh, something went wrong during delete!
       console.error(`Failed to delete ${itemDescription}:`, err);
-      setError(`Failed to delete "${itemDescription}": ${err.message}`); // Show error in UI maybe?
-      alert(`Error deleting "${itemDescription}": ${err.message}`); // Show error alert.
-    } finally {
-      setIsDeleting(false); // Finished the delete attempt (success or fail).
-    }
+      setError(`Failed to delete "${itemDescription}": ${err.message}`);
+      alert(`Error deleting "${itemDescription}": ${err.message}`);
+    } finally { setIsDeleting(false); }
   };
-
-  // Handler for deleting a specific note entry - called by ContentDisplay.
-  const handleDeleteNote = useCallback(async (noteId, noteIdentifier = 'this note') => {
-    console.log(`Requesting delete for note ID: ${noteId}`);
-    // ** Uses the specified backend endpoint /delete_document/<_id> **
-    if (!noteId) { console.error("handleDeleteNote called without noteId!"); setError("Cannot delete note: Missing ID."); return; }
-
-    // *** UPDATED URL for specific note delete ***
-    const url = `/delete_document/${noteId}`; // Use the path provided
-
-    // Call the generic delete helper.
-    await performDelete(url, noteIdentifier, () => {
-      // After successful delete, refresh the content if we were viewing that topic.
-      if (selectedItem) {
-        console.log("Refreshing content after note delete...");
-        // Re-trigger the useEffect hook to refresh content
-        const currentSelection = { ...selectedItem }; // Shallow copy
-        setSelectedItem(null); // Clear selection briefly
-        setTimeout(() => setSelectedItem(currentSelection), 0); // Re-set selection immediately
-      }
-      // fetchStructure('afterNoteDelete'); // Optionally refresh structure if backend changes it
-    });
-  }, [selectedItem]); // Depends on selectedItem to know what to refresh.
-
-  // Handler for deleting a topic folder - called by Sidebar.
-  const handleDeleteTopic = useCallback(async (subject, className, topic) => {
-    console.log(`Requesting delete for topic: ${subject}/${className}/${topic}`);
-    // ** Requires backend endpoint like /api/topics?subject=...&class=...&topic=... **
-    // *** ADJUST URL AS NEEDED ***
-    const url = `/api/topics?subject=${encodeURIComponent(subject)}&class=${encodeURIComponent(className)}&topic=${encodeURIComponent(topic)}`;
-    const description = `Topic: ${topic}`;
-    await performDelete(url, description, () => {
-      if (selectedItem?.subject === subject && selectedItem?.class === className && selectedItem?.topic === topic) { setSelectedItem(null); setCurrentContent(null); }
-      fetchStructure('afterTopicDelete'); // ALWAYS refresh sidebar structure
-    });
-  }, [selectedItem, fetchStructure]);
-
-  // Handler for deleting a class folder - called by Sidebar.
-  const handleDeleteClass = useCallback(async (subject, className) => {
-     console.log(`Requesting delete for class: ${subject}/${className}`);
-    // ** Requires backend endpoint like /api/classes?subject=...&class=... **
-     // *** ADJUST URL AS NEEDED ***
-     const url = `/api/classes?subject=${encodeURIComponent(subject)}&class=${encodeURIComponent(className)}`;
-     const description = `Class: ${className}`;
-     await performDelete(url, description, () => {
-         if (selectedItem?.subject === subject && selectedItem?.class === className) { setSelectedItem(null); setCurrentContent(null); }
-         fetchStructure('afterClassDelete'); // ALWAYS refresh sidebar structure
-     });
-  }, [selectedItem, fetchStructure]);
-
-  // Handler for deleting a subject folder - called by Sidebar.
-  const handleDeleteSubject = useCallback(async (subject) => {
-      console.log(`Requesting delete for subject: ${subject}`);
-      // ** Requires backend endpoint like /api/subjects?subject=... **
-      // *** ADJUST URL AS NEEDED ***
-      const url = `/api/subjects?subject=${encodeURIComponent(subject)}`;
-      const description = `Subject: ${subject}`;
-      await performDelete(url, description, () => {
-          if (selectedItem?.subject === subject) { setSelectedItem(null); setCurrentContent(null); }
-          fetchStructure('afterSubjectDelete'); // ALWAYS refresh sidebar structure
-      });
-  }, [selectedItem, fetchStructure]);
+  // Specific Delete Handlers
+  const handleDeleteNote = useCallback(async (noteId, noteIdentifier = 'this note') => { const url = `/delete_document/${noteId}`; /* TODO: Base URL */ await performDelete(url, noteIdentifier, () => { if (selectedItem) { const currentSelection = { ...selectedItem }; setSelectedItem(null); setTimeout(() => setSelectedItem(currentSelection), 0); } }); }, [selectedItem]);
+  const handleDeleteTopic = useCallback(async (subject, className, topic) => { const url = `/api/topics?subject=${encodeURIComponent(subject)}&class=${encodeURIComponent(className)}&topic=${encodeURIComponent(topic)}`; /* TODO: Base URL */ const desc = `Topic: ${topic}`; await performDelete(url, desc, () => { if (selectedItem?.subject === subject && selectedItem?.class === className && selectedItem?.topic === topic) { setSelectedItem(null); setCurrentContent(null); } fetchStructure('afterTopicDelete'); }); }, [selectedItem, fetchStructure]);
+  const handleDeleteClass = useCallback(async (subject, className) => { const url = `/api/classes?subject=${encodeURIComponent(subject)}&class=${encodeURIComponent(className)}`; /* TODO: Base URL */ const desc = `Class: ${className}`; await performDelete(url, desc, () => { if (selectedItem?.subject === subject && selectedItem?.class === className) { setSelectedItem(null); setCurrentContent(null); } fetchStructure('afterClassDelete'); }); }, [selectedItem, fetchStructure]);
+  const handleDeleteSubject = useCallback(async (subject) => { const url = `/api/subjects?subject=${encodeURIComponent(subject)}`; /* TODO: Base URL */ const desc = `Subject: ${subject}`; await performDelete(url, desc, () => { if (selectedItem?.subject === subject) { setSelectedItem(null); setCurrentContent(null); } fetchStructure('afterSubjectDelete'); }); }, [selectedItem, fetchStructure]);
   // --- End Delete Handlers ---
 
 
   // --- THE RENDERED JSX --- What the user actually sees! ---
   return (
-    // Fragment because Modal & Theme Button are siblings to the main layout.
     <>
       {/* Deleting Overlay */}
       {isDeleting && <div className="delete-overlay">Deleting... Please Wait...</div>}
@@ -252,28 +185,26 @@ function App() {
       {/* Main app layout container */}
       <div className={`app-container ${isDeleting ? 'deleting' : ''}`} ref={appContainerRef}>
 
-        {/* Sidebar Component - Pass delete handlers down! */}
+        {/* Sidebar Component - Pass the *transformed* nested structure */}
         <Sidebar
           ref={sidebarRef}
           style={{ width: `${sidebarWidth}px` }}
-          structure={folderStructure} // Pass fetched structure
-          onSelectTopic={handleSelectTopic} // Pass select handler
-          selectedItem={selectedItem} // Pass current selection
-          onResizeMouseDown={handleMouseDown} // Pass resize mousedown handler
-          onOpenUploadModal={openModal} // Pass modal open handler
-          // --- Pass Delete Handlers as Props ---
+          structure={folderStructure} // Pass the structure built by fetchStructure
+          onSelectTopic={handleSelectTopic}
+          selectedItem={selectedItem}
+          onResizeMouseDown={handleMouseDown}
+          onOpenUploadModal={openModal}
           onDeleteSubject={handleDeleteSubject}
           onDeleteClass={handleDeleteClass}
           onDeleteTopic={handleDeleteTopic}
         />
 
-        {/* Content Display Component - Pass delete handler down! */}
+        {/* Content Display Component - Pass the array fetched from /api/content */}
         <ContentDisplay
-          content={currentContent} // Pass the content array (or null) fetched from backend
-          selectedItem={selectedItem} // Pass selected item info
-          isLoading={isLoading && !isDeleting} // Show loading only if NOT deleting maybe?
-          error={error} // Pass error message
-          // --- Pass Delete Handler as Prop ---
+          content={currentContent}
+          selectedItem={selectedItem}
+          isLoading={isLoading && !isDeleting}
+          error={error}
           onDeleteNote={handleDeleteNote}
         />
 
@@ -285,12 +216,12 @@ function App() {
         {theme === 'light' ? '🌙' : '☀️'}
       </button>
 
-      {/* Upload Modal - Upload/Success will now interact with live backend/fetchStructure */}
+      {/* Upload Modal */}
       <UploadModal isOpen={isModalOpen} onClose={closeModal} onUploadSuccess={() => fetchStructure('afterUpload')} />
 
     </> // End React Fragment
   ); // End return
-} // End App component function
+} // End App component
 
 // Export App!
 export default App;

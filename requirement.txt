@@ -7,6 +7,5 @@ dotenv
 yt_dlp
 datetime
 requests
-bson
-firebase-admin
-flask-jwt-extended
+flask_cors
+google-generativeai
