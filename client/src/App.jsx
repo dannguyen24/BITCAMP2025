@@ -132,7 +132,7 @@ function App() {
     // Check if the selection matches our specific mock content key
     if ( selectedItem.subject === "Computer Science" && selectedItem.class === "CS 202 - Data Structures" && selectedItem.topic === "Linked Lists" ) {
       console.log("Setting mock content for Linked Lists.");
-      setTimeout(() => { setCurrentContent(mockContentData); setIsLoading(false); }, 300); // Simulate delay
+      setTimeout(() => { console.log("Setting currentContent STATE to:", mockContentData); setCurrentContent(mockContentData); setIsLoading(false); }, 300); // Simulate delay
     } else {
       console.log("No specific mock content found. Setting empty array.");
        setTimeout(() => { setCurrentContent([]); setIsLoading(false); }, 300); // Simulate delay
