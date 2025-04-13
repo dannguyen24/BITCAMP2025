@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login</title>
+</head>
+<body>
+  <h2>Login</h2>
+  <button id="google-login-btn">Login with Google</button>
+  
+  <script src="main.js" defer type = "module"></script>
+  <!-- <script type="module">
+    // Firebase config (get this from your Firebase project settings)
+    const firebaseConfig = {
+      apiKey: "AIzaSyCQm2YfpI2nOQego8XxoxX4xQ-9rFp0Qnw",
+      authDomain: "studyez2025.firebaseapp.com",
+      projectId: "studyez2025"
+    };
+    
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
+    
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+    
+    window.signIn = async function () {
+      try {
+        const result = await signInWithPopup(auth, provider);
+        const idToken = await result.user.getIdToken();
+        const res = await fetch("/firebase-login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ idToken })
+        });
+        
+        // Check response status
+        console.log("Response status:", res.status);
+        
+        if (!res.ok) {
+          // Simpler error message
+          alert(`Login failed: Server returned status ${res.status}`);
+          return;
+        }
+        // Only try to parse JSON if the response was successful
+        const data = await res.json();
+        
+        if (data.success) {
+          window.location.href = "/dashboard";
+        } else {
+          alert("Login failed.");
+        }
+      } catch (error) {
+        console.error("Login error:", error);
+        alert("Login failed: " + error.message);
+      }
+    } 
+  </script>-->
+</body>
+</html>
