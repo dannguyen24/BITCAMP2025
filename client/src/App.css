@@ -1,41 +1,43 @@
-/* src/App.css */
+/* Let's get some nice fonts! Poppins is pretty cool! Downloaded from Google Fonts! */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
 
-/* --- Theme Variables --- Organized and Semantic! 🎨 --- */
+/* --- Theme Variables --- Our Color Palette! Organized and Semantic! 🎨 --- */
+/* Define colors here so we can reuse them easily! Yay variables! No more hunting hex codes! */
 :root {
   /* Light Mode Colors - Semantic Names! */
-  --bg-primary: #f8f7fc;
-  --bg-surface: #ffffff;
-  --text-primary: #4b415f;
-  --text-secondary: #b39ddb;
-  --text-on-accent: #ffffff;
-  --accent-primary: #9575cd;
-  --accent-secondary: #b39ddb;
-  --accent-tertiary: #d1c4e9;
-  --border-primary: #e0ddee;
-  --shadow-primary: rgba(149, 117, 205, 0.1);
-  --scroll-track: #f8f7fc;
-  --scroll-thumb: #d1c4e9;
-  --scroll-thumb-hover: #b39ddb;
+  --bg-primary: #f8f7fc;        /* Main page background */
+  --bg-surface: #ffffff;         /* Card/Sidebar/Modal background */
+  --text-primary: #4b415f;      /* Main text color */
+  --text-secondary: #b39ddb; /* Softer text, placeholder text */
+  --text-on-accent: #ffffff;       /* Text on accent buttons */
+  --accent-primary: #9575cd;   /* Main interactive purple */
+  --accent-secondary: #b39ddb; /* Lighter interactive purple */
+  --accent-tertiary: #d1c4e9;    /* Lightest interactive purple */
+  --border-primary: #e0ddee;    /* Default borders */
+  --shadow-primary: rgba(149, 117, 205, 0.1); /* Default shadows */
+  --scroll-track: #f8f7fc;        /* Scrollbar track color */
+  --scroll-thumb: #d1c4e9;   /* Scrollbar thumb color */
+  --scroll-thumb-hover: #b39ddb; /* Scrollbar thumb hover color */
   --overlay-bg: rgba(75, 65, 95, 0.6); /* Light mode overlay */
 }
 
 /* --- Dark Mode Color Definitions & ***REASSIGNMENTS*** --- */
+/* This block applies ONLY when the body tag has the 'dark-mode' class! */
 body.dark-mode {
   /* Define dark mode specific values */
-  --dm-bg-primary: #1a1a2e;
-  --dm-bg-surface: #2a2a3e;
-  --dm-text-primary: #e0e0ff;
-  --dm-text-secondary: #a0a0cf;
-  --dm-text-on-accent: #ffffff;
-  --dm-accent-primary: #a188da;
-  --dm-accent-secondary: #c4b5fc;
-  --dm-accent-tertiary: #e0ddee;
-  --dm-border-primary: #40405f;
-  --dm-shadow-primary: rgba(0, 0, 0, 0.25);
-  --dm-scroll-track: #2a2a3e;
-  --dm-scroll-thumb: #40405f;
-  --dm-scroll-thumb-hover: #5c5c8a;
+  --dm-bg-primary: #1a1a2e; /* Dark Navy/Purple background */
+  --dm-bg-surface: #2a2a3e; /* Darker Grey/Purple for cards/sidebar */
+  --dm-text-primary: #e0e0ff; /* Light lavender/white text */
+  --dm-text-secondary: #a0a0cf; /* Muted light purple for secondary text */
+  --dm-text-on-accent: #ffffff; /* White text still works on our purples! */
+  --dm-accent-primary: #a188da; /* Slightly brighter accent purple */
+  --dm-accent-secondary: #c4b5fc; /* Lighter secondary purple */
+  --dm-accent-tertiary: #e0ddee; /* Very light tertiary purple (was border color) */
+  --dm-border-primary: #40405f; /* Muted dark grey/purple border */
+  --dm-shadow-primary: rgba(0, 0, 0, 0.25); /* Standard darker shadow */
+  --dm-scroll-track: #2a2a3e; /* Dark scrollbar track */
+  --dm-scroll-thumb: #40405f; /* Dark scrollbar thumb */
+  --dm-scroll-thumb-hover: #5c5c8a; /* Dark scrollbar thumb hover */
   --dm-overlay-bg: rgba(26, 26, 46, 0.7); /* Dark mode overlay */
 
   /* --- !!! CRUCIAL: Reassign the main variables !!! --- */
@@ -57,123 +59,154 @@ body.dark-mode {
 }
 
 
-/* --- Basic Body Styles --- */
+/* --- Basic Body Styles --- Apply the variables! Getting Dressed! --- */
 body {
-  margin: 0;
-  font-family: 'Poppins', sans-serif;
-  background-color: var(--bg-primary); /* Use variable */
-  color: var(--text-primary); /* Use variable */
-  overscroll-behavior: none;
-  overflow: hidden;
-  transition: background-color 0.3s ease, color 0.3s ease; /* Smooth theme change */
+  margin: 0; /* No default margins! */
+  font-family: 'Poppins', sans-serif; /* Use our lovely font! */
+  background-color: var(--bg-primary); /* Use variable for background! */
+  color: var(--text-primary); /* Use variable for main text color! */
+  overscroll-behavior: none; /* Stop weird browser bounce/refresh behaviors */
+  overflow: hidden; /* Prevent BODY scrollbars */
+  transition: background-color 0.3s ease, color 0.3s ease; /* Smooth theme transition! Nice! */
 }
 
-/* --- Main App Layout --- Using GAP for spacing! --- */
+/* --- Main App Layout --- Flexbox Power! Using GAP for spacing! --- */
 .app-container {
-  display: flex;
-  height: 100vh;
-  overflow: hidden;
-  /* --- Use GAP for spacing between sidebar and content --- */
+  display: flex; /* Side-by-side layout magic! */
+  height: 100vh; /* Full viewport height! */
+  overflow: hidden; /* Prevent scrollbars on the container itself */
   gap: 15px; /* Adjust this value for desired spacing! */
+  transition: opacity 0.3s ease; /* Add transition for deleting overlay */
+}
+/* Style to apply when deleting is in progress */
+.app-container.deleting {
+  opacity: 0.7; /* Dim the background slightly */
+  pointer-events: none; /* Prevent interaction with main app */
 }
 
-/* --- Sidebar Styles --- */
+
+/* --- Sidebar Styles --- The Navigator! Using Variables! --- */
 .sidebar {
-  background-color: var(--bg-surface);
-  display: flex;
-  flex-direction: column;
-  box-shadow: 2px 0 15px var(--shadow-primary);
-  flex-shrink: 0;
-  position: relative; /* Still needed for handle */
-  overflow: hidden;
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  /* Dynamic width set by JS inline style, so no 'width' rule here! */
+  background-color: var(--bg-surface); /* Use surface background variable! */
+  display: flex; /* Use flexbox for internal layout */
+  flex-direction: column; /* Stack children vertically */
+  box-shadow: 2px 0 15px var(--shadow-primary); /* Use shadow variable! */
+  flex-shrink: 0; /* Stop it from shrinking! */
+  position: relative; /* CRUCIAL! Needed for the absolute positioned handle inside! */
+  overflow: hidden; /* Hide internal overflow */
+  transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Smooth theme transition! */
 }
-/* Title Area */
+/* Styles for the Title Area in Sidebar (Title + Upload Button) */
 .sidebar-title-area { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px 0px 20px; margin-bottom: 10px; flex-shrink: 0; }
 .sidebar-title-area h2 { margin: 0; color: var(--accent-primary); font-size: 1.4em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-/* Upload Button */
 .upload-modal-button { padding: 5px 10px; font-size: 0.9em; font-weight: 500; background-color: var(--accent-primary); color: var(--text-on-accent); border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.2s ease; white-space: nowrap; margin-left: 10px; }
 .upload-modal-button:hover { background-color: var(--accent-secondary); }
-/* Scrollable Content */
+/* Sidebar Scrollable Content Area (Folders/Topics) */
 .sidebar-content-scrollable { flex-grow: 1; overflow-y: auto; padding: 0 10px 20px 20px; }
-/* Lists */
+
+/* Subject/Class/Topic List Styling (Hierarchical look!) */
 .subject-list, .class-list, .topic-list { list-style: none; padding: 0; margin: 0; }
-.subject-item, .class-item { margin-bottom: 10px; }
-.subject-header { font-weight: 600; color: var(--text-primary); font-size: 1.1em; margin-bottom: 5px; padding-left: 5px; cursor: default; }
+.subject-item, .class-item { margin-bottom: 5px; /* Reduced margin slightly */ } /* Reduced margin */
+
+/* Clickable Headers (Subjects and Classes) */
+.clickable-header { cursor: pointer; padding: 4px 5px; border-radius: 4px; transition: background-color 0.15s ease; display: flex; align-items: center; /* Ensure alignment */ }
+.clickable-header:hover { background-color: var(--accent-tertiary); }
+body.dark-mode .clickable-header:hover { background-color: #3a3a4e; }
+
+/* Arrow Styling */
+.sidebar-arrow { display: inline-block; margin-right: 6px; font-size: 0.7em; transition: transform 0.2s ease-in-out; transform: rotate(0deg); color: var(--text-secondary); }
+.clickable-header[aria-expanded="true"] .sidebar-arrow, .sidebar-arrow.expanded { transform: rotate(90deg); }
+
+/* Subject Header Styles (Applied within clickable-header) */
+.subject-header { font-weight: 600; color: var(--text-primary); font-size: 1.1em; }
 .class-list { padding-left: 15px; }
-.class-header { font-weight: 500; color: var(--text-primary); font-size: 1.0em; margin-bottom: 5px; padding-left: 5px; cursor: default; }
+/* Class Header Styles (Applied within clickable-header) */
+.class-header { font-weight: 500; color: var(--text-primary); font-size: 1.0em; }
 .topic-list { padding-left: 15px; }
-.topic-item { padding: 6px 10px; margin-bottom: 4px; border-radius: 5px; cursor: pointer; transition: background-color 0.2s ease, color 0.2s ease; font-size: 0.9em; word-break: break-word; color: var(--text-primary); }
-/* Hover/Selected States */
+/* Topic Item Styles */
+.topic-item { padding: 6px 10px; border-radius: 5px; cursor: pointer; transition: background-color 0.2s ease, color 0.2s ease; font-size: 0.9em; word-break: break-word; color: var(--text-primary); }
+/* Topic Item Hover/Selected States */
 .topic-item:hover { background-color: var(--accent-tertiary); color: var(--text-primary); }
 body.dark-mode .topic-item:hover { background-color: #3a3a4e; color: var(--text-primary); }
 .topic-item.selected { background-color: var(--accent-secondary); color: var(--text-on-accent); font-weight: 500; }
 body.dark-mode .topic-item.selected { background-color: var(--accent-primary); color: var(--text-on-accent); }
 
-/* --- Invisible Resizer Handle --- Adjusted for GAP --- */
-.sidebar-border-handle {
-  position: absolute; top: 0; bottom: 0;
-  /* --- ADJUSTED POSITIONING for GAP --- */
-  /* Place it right AT the edge now, the gap provides the space */
-  right: -5px; /* Start slightly overlapping the edge into the gap */
-  width: 10px; /* Keep it reasonably wide */
-  /* --- END ADJUSTED POSITIONING --- */
-  cursor: col-resize; z-index: 10;
-  /* background-color: rgba(0, 255, 0, 0.1); */ /* DEBUG */
-}
-/* Optional Dark Mode Hover */
+/* Container for Subject/Class/Topic items + Delete Button */
+.subject-header-container, .class-header-container, .topic-item-container { display: flex; align-items: center; justify-content: space-between; padding-right: 5px; box-sizing: border-box; position: relative; }
+.clickable-header.subject-header-container, .clickable-header.class-header-container { /* Inherits padding/hover */ }
+/* Topic container adjustments */
+.topic-item-container { margin-bottom: 4px; border-radius: 5px; margin-left: 14px; /* Keep overall indent */ padding: 0; /* Remove padding from container */ }
+.topic-item-container:hover { /* Maybe highlight container slightly? */ /* background-color: rgba(0,0,0,0.02); */ }
+body.dark-mode .topic-item-container:hover { /* background-color: rgba(255,255,255,0.02); */ }
+/* Apply selected style to container */
+.topic-item-container.selected { background-color: var(--accent-secondary); }
+body.dark-mode .topic-item-container.selected { background-color: var(--accent-primary); }
+/* Ensure topic text itself doesn't get weird background */
+.topic-item-container .topic-item { margin-left: 0; flex-grow: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.topic-item-container.selected .topic-item { background-color: transparent !important; color: var(--text-on-accent) !important; }
+.topic-item-container:hover .topic-item:not(.selected) { background-color: transparent; } /* Prevent item hover when container hovers maybe? */
+
+
+/* Header content wrapper (Arrow + Text) */
+.header-content { display: flex; align-items: center; flex-grow: 1; min-width: 0; }
+.header-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; /* Handle long names */ }
+
+
+/* --- Styles for the INVISIBLE Resizer Handle INSIDE Sidebar --- Adjusted for GAP --- */
+.sidebar-border-handle { position: absolute; top: 0; bottom: 0; right: -5px; width: 10px; cursor: col-resize; z-index: 10; }
 body.dark-mode .sidebar-border-handle:hover { /* background-color: rgba(255, 255, 255, 0.05); */ }
+/* --- End Invisible Handle Styles --- */
 
 
-/* --- Content Display Area Styles --- NO MARGIN needed now! --- */
-.content-display {
-  flex-grow: 1; /* Takes up remaining space */
-  padding: 30px; /* Inner spacing */
-  overflow-y: auto; /* Allow scroll */
-  background-color: var(--bg-primary); /* Themed background */
-  min-width: 300px; /* Prevent squishing */
-  transition: background-color 0.3s ease; /* Smooth theme change */
-  /* --- NO margin-left needed here anymore because .app-container has gap! --- */
-  /* margin-left: 15px; */ /* REMOVED */
-}
+/* --- Content Display Area Styles --- Where the good stuff is! Using Variables! --- */
+.content-display { flex-grow: 1; padding: 40px; overflow-y: auto; background-color: var(--bg-primary); min-width: 300px; transition: background-color 0.3s ease; /* NO margin-left */ }
 
 /* Placeholder/Loading/Error Styles */
-.placeholder, .loading, .error { display: flex; justify-content: center; align-items: center; height: calc(100% - 60px); font-size: 1.2em; color: var(--text-secondary); text-align: center; }
-.error { color: #c0392b; }
-body.dark-mode .error { color: #e74c3c; }
+.placeholder, .loading, .error { display: flex; justify-content: center; align-items: center; height: calc(100% - 80px); font-size: 1.2em; color: var(--text-secondary); text-align: center; padding-left: 40px; padding-right: 40px; box-sizing: border-box; }
+.error { color: #c0392b; } body.dark-mode .error { color: #e74c3c; }
+.loading { /* Could add spinner */ }
 
-/* Note Entry Styles */
-.note-entry { margin-bottom: 35px; /* Inherits from content-section below */ }
-.note-date { font-size: 0.9em; color: var(--text-secondary); margin-bottom: 20px; text-align: right; }
-.note-subsection { margin-bottom: 20px; }
-.note-subsection h4 { margin-top: 0; margin-bottom: 8px; color: var(--accent-primary); font-size: 1.1em; border-bottom: 1px dashed var(--border-primary); padding-bottom: 5px; display: inline-block; }
-.note-subsection ul { list-style: disc; padding-left: 25px; margin: 0; font-size: 0.95em; }
-.note-subsection p { margin: 0; font-size: 0.95em; line-height: 1.6; }
+/* --- Note Entry Styles --- Increasing sizes/spacing! --- */
+.note-entry { /* Style for the card holding ONE note's info */ margin-bottom: 0; } /* Remove bottom margin, use divider padding */
+.note-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 25px; } /* Container for date/delete */
+.note-date { font-size: 0.95em; color: var(--text-secondary); margin-bottom: 0; margin-left: 15px; text-align: right; flex-shrink: 0; }
+.note-subsection { margin-bottom: 35px; } .note-entry .note-subsection:last-child { margin-bottom: 25px; }
+.note-subsection h4 { margin-top: 0; margin-bottom: 15px; color: var(--accent-primary); font-size: 1.15em; border-bottom: 1px dashed var(--border-primary); padding-bottom: 8px; display: inline-block; }
+.note-subsection ul { list-style: disc; padding-left: 30px; margin: 0 0 10px 0; font-size: 1em; line-height: 1.7; }
+.note-subsection p { margin: 0; font-size: 1em; line-height: 1.7; }
+/* Content Sections (Base card style for .note-entry) - Made transparent */
+.content-section { background-color: transparent; padding: 0; border-radius: 0; margin-bottom: 0; box-shadow: none; transition: background-color 0.3s ease; width: 100%; box-sizing: border-box; }
 
-/* Content Sections (Cards inside Content Display) */
-.content-section { /* Also applies to .note-entry */
-  background-color: var(--bg-surface); padding: 25px; border-radius: 8px; margin-bottom: 25px; box-shadow: 0 4px 15px var(--shadow-primary); transition: background-color 0.3s ease, box-shadow 0.3s ease;
-}
-.content-section h3 { /* Less specific than h4 above */ margin-top: 0; color: var(--accent-primary); border-bottom: 1px solid var(--accent-tertiary); padding-bottom: 10px; margin-bottom: 15px; }
+/* Resources/Transcript Area Styles - Now acts like the card */
+.resources-area, .transcript-area { white-space: pre-wrap; word-wrap: break-word; font-size: 1em; line-height: 1.7; color: var(--text-primary); max-height: 45vh; overflow-y: auto; background-color: var(--bg-surface); padding: 20px; border-radius: 8px; border: 1px solid var(--border-primary); transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; box-shadow: 0 2px 5px var(--shadow-primary); }
+body.dark-mode .resources-area, body.dark-mode .transcript-area { background-color: var(--dm-bg-surface); border-color: var(--dm-border-primary); box-shadow: 0 2px 5px var(--dm-shadow-primary); }
 
-/* Transcript/Resources Areas */
-.resources-area, .transcript-area { white-space: pre-wrap; word-wrap: break-word; font-size: 0.95em; line-height: 1.6; color: var(--text-primary); max-height: 35vh; overflow-y: auto; background-color: var(--bg-primary); padding: 15px; border-radius: 5px; border: 1px solid var(--border-primary); transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease; }
-body.dark-mode .resources-area, body.dark-mode .transcript-area { background-color: #1f1f34; }
+/* --- Styles for Resource Table --- Looks professional! --- */
+.resource-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.95em; border: 1px solid var(--border-primary); border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px var(--shadow-primary); }
+.resource-table th, .resource-table td { border: none; border-bottom: 1px solid var(--border-primary); padding: 12px 15px; text-align: left; vertical-align: top; background-color: var(--bg-surface); }
+.resource-table tr:last-child td { border-bottom: none; }
+.resource-table th { background-color: var(--bg-primary); color: var(--text-primary); font-weight: 600; white-space: nowrap; border-bottom-width: 2px; }
+body.dark-mode .resource-table th { background-color: #3a3a4e; } body.dark-mode .resource-table td { background-color: var(--dm-bg-surface); }
+.resource-table a { color: var(--accent-primary); text-decoration: none; font-weight: 500; } .resource-table a:hover { color: var(--accent-secondary); text-decoration: underline; }
+.resource-na { color: var(--text-secondary); font-style: italic; }
+/* --- End Resource Table Styles --- */
 
 /* Collapsible Section Styles */
-.collapsible-section { margin-top: 15px; }
-.collapsible-header { background: none; border: none; border-bottom: 1px dashed var(--border-primary); padding: 5px 0; width: auto; display: inline-block; text-align: left; font-size: 1.1em; font-weight: normal; color: var(--accent-primary); cursor: pointer; margin-bottom: 10px; }
+.collapsible-section { margin-top: 20px; }
+.collapsible-header { background: none; border: none; border-bottom: 1px dashed var(--border-primary); padding: 5px 0; width: auto; display: inline-block; text-align: left; font-size: 1.15em; font-weight: normal; color: var(--accent-primary); cursor: pointer; margin-bottom: 15px; }
 .collapsible-header:hover { color: var(--accent-secondary); }
 .collapse-arrow { display: inline-block; margin-right: 8px; transition: transform 0.2s ease-in-out; font-size: 0.8em; transform: rotate(0deg); }
 .collapsible-header[aria-expanded="true"] .collapse-arrow { transform: rotate(90deg); }
-.collapsible-content { /* No specific styles needed if just using JS render logic */ }
+.collapsible-content { /* Padding/border applied to child (.transcript-area) */ }
 
-/* Note Divider */
-hr.note-divider { border: none; border-top: 2px solid var(--border-primary); margin: 40px 0; opacity: 0.5; }
+/* --- Note Divider --- Separating multiple notes --- Adjusted for Padding --- */
+hr.note-divider { border: none; border-top: 1px solid var(--border-primary); margin: 0 40px 0 40px; padding-top: 50px; padding-bottom: 50px; box-sizing: content-box; height: 0; opacity: 0.5; }
 
 
-/* --- Modal Styles --- Using Variables --- */
+/* --- Styles for the NEW Upload Modal! --- The Popup! Using Variables! --- */
 .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--overlay-bg); display: flex; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(3px); }
+body.dark-mode .modal-overlay { --overlay-bg: rgba(26, 26, 46, 0.7); }
 .modal-content { background-color: var(--bg-surface); padding: 30px 40px; border-radius: 8px; box-shadow: 0 5px 25px var(--shadow-primary); position: relative; max-width: 500px; width: 90%; z-index: 1001; max-height: 85vh; overflow-y: auto; transition: background-color 0.3s ease, box-shadow 0.3s ease; }
 .modal-close-button { position: absolute; top: 10px; right: 15px; background: none; border: none; font-size: 1.8em; font-weight: bold; color: var(--text-secondary); cursor: pointer; padding: 0; line-height: 1; transition: color 0.2s ease; }
 .modal-close-button:hover { color: var(--accent-primary); }
@@ -201,15 +234,112 @@ body.dark-mode .url-input-section .url-input-field:focus { border-color: var(--a
 .modal-content .main-upload-button { display: block; width: 100%; padding: 10px 15px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 1em; transition: background-color 0.2s ease, opacity 0.2s ease; margin-top: 5px; background-color: var(--accent-primary); color: var(--text-on-accent); }
 .modal-content .main-upload-button:hover { background-color: var(--accent-secondary); }
 .modal-content .main-upload-button:disabled { background-color: var(--accent-tertiary); opacity: 0.7; cursor: not-allowed; }
+/* --- End Modal Styles --- */
 
 
-/* --- Scrollbar Styling --- Using Variables! --- */
-::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-track { background: var(--scroll-track); border-radius: 10px; }
-::-webkit-scrollbar-thumb { background-color: var(--scroll-thumb); border-radius: 10px; border: 2px solid var(--scroll-track); }
-::-webkit-scrollbar-thumb:hover { background-color: var(--scroll-thumb-hover); }
+/* --- !!! DELETE BUTTON STYLES - Increased Specificity & Checked Rules !!! --- */
+/* Base style for ALL delete buttons */
+.delete-button {
+  background: none;
+  border: none;
+  /* === Set Base Color Directly === */
+  color: var(--accent-primary); /* Default: Use accent color */
+  cursor: pointer;
+  padding: 2px 4px;
+  font-size: 1em; /* Let emoji inherit size or set explicitly */
+  line-height: 1;
+  opacity: 1.0; /* Fully opaque */
+  transition: color 0.2s ease, transform 0.1s ease;
+  /* Reset font smoothing just in case */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+/* Base hover for ALL delete buttons */
+.delete-button:hover {
+  /* Use !important to ensure red hover takes precedence */
+  color: #e74c3c !important; /* Red hover */
+  transform: scale(1.1);
+}
+.delete-button:active {
+    transform: scale(0.95);
+}
+
+/* Specific styles for delete buttons INSIDE the sidebar */
+.sidebar .delete-button { /* Specificity */
+    margin-left: auto; padding-left: 8px; font-size: 0.9em; flex-shrink: 0;
+}
+.sidebar .topic-delete-button { /* Specificity */
+    padding-left: 8px; flex-shrink: 0;
+}
+
+/* Specific styles for delete button INSIDE the note header */
+.note-delete-button {
+    font-size: 1.1em; padding: 5px; flex-shrink: 0; order: -1;
+    opacity: 0.6; /* Keep note delete slightly faded by default */
+    /* === FIX: Ensure correct default color if different === */
+    color: var(--text-secondary); /* Override base accent color for note delete */
+}
+.note-delete-button:hover {
+     opacity: 1.0; /* Override base hover opacity if needed */
+     /* The base .delete-button:hover rule with !important will handle the red color */
+}
+
+/* === Dark Mode Delete Button Colors - INCREASED SPECIFICITY === */
+/* Target sidebar delete buttons specifically in dark mode */
+body.dark-mode .sidebar .delete-button {
+    /* Use !important to force override */
+    color: #ff7b7b !important; /* Lighter red default for dark mode sidebar */
+}
+/* Target note delete button specifically in dark mode */
+body.dark-mode .note-delete-button {
+    /* Use !important to force override */
+    color: var(--text-secondary) !important; /* Keep secondary color for note delete */
+    opacity: 0.6; /* Maintain fade */
+}
+/* Dark mode HOVER for ALL delete buttons - using !important */
+body.dark-mode .delete-button:hover {
+    color: #ff4d4d !important; /* Brighter red hover for dark mode */
+}
+/* Ensure dark mode note delete hover gets the bright red too */
+body.dark-mode .note-delete-button:hover {
+     opacity: 1.0; /* Override opacity */
+     /* Color handled by the general dark mode hover rule above */
+}
 
 
-/* --- Theme Toggle Button Style --- */
+/* Style for marked items - Increased Specificity */
+.subject-header-container .marked-for-delete,
+.class-header-container .marked-for-delete,
+.topic-item-container .marked-for-delete {
+    text-decoration: line-through;
+    text-decoration-color: #e74c3c !important; /* Use !important to ensure override */
+    text-decoration-thickness: 2px;
+    opacity: 0.7; /* Make text slightly faded */
+    transition: opacity 0.2s ease, text-decoration-color 0.2s ease;
+    color: inherit !important; /* Don't change base text color, just add decoration */
+}
+/* Hover on marked items */
+.clickable-header:hover .marked-for-delete,
+.topic-item-container:hover .marked-for-delete {
+    opacity: 0.8; /* Make slightly more visible on hover */
+}
+/* --- End Delete Button Styles --- */
+
+
+/* --- Optional: Overlay during delete operation --- */
+.delete-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.5); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.5em; z-index: 2000; }
+/* --- End Delete Overlay --- */
+
+
+/* --- Scrollbar Styling --- Using Variables! --- Optional, but nice! --- */
+::-webkit-scrollbar { width: 8px; height: 8px; /* Size */ }
+::-webkit-scrollbar-track { background: var(--scroll-track); border-radius: 10px; /* Rounded track */ }
+::-webkit-scrollbar-thumb { background-color: var(--scroll-thumb); border-radius: 10px; /* Rounded thumb */ border: 2px solid var(--scroll-track); /* Padding effect using track color */ }
+::-webkit-scrollbar-thumb:hover { background-color: var(--scroll-thumb-hover); /* Use scroll thumb hover variable */ }
+/* --- End Scrollbar Styling --- */
+
+
+/* --- Theme Toggle Button Style --- The Sun/Moon button! ☀️/🌙 --- */
 .theme-toggle-button { position: fixed; top: 15px; right: 20px; padding: 8px 10px; background-color: var(--bg-surface); color: var(--text-primary); border: 1px solid var(--border-primary); border-radius: 50%; cursor: pointer; font-size: 1.2em; line-height: 1; z-index: 1050; box-shadow: 0 2px 5px var(--shadow-primary); transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease; }
 .theme-toggle-button:hover { transform: scale(1.1); box-shadow: 0 4px 8px var(--shadow-primary); }
+/* --- End Theme Toggle Button Style --- */
