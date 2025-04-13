@@ -29,11 +29,12 @@ function FileUpload({ onUploadSuccess }) {
 
     console.log("Uploading FILE via axios to http://localhost:5000/upload ...");
     setIsUploading(true); // We're busy!
+    
     const formData = new FormData(); // File needs FormData!
     formData.append('file', file); // Key 'file' must match backend!
 
     try {
-      const res = await axios.post('http://localhost:5000/upload', formData, {
+      const res = await axios.post('http://localhost:5000/upload_file', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }, // Tell backend it's a file!
       });
       console.log("File upload response:", res.data);

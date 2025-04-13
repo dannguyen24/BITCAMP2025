@@ -20,6 +20,13 @@ import google.generativeai as gen_ai
 
 #Import ObjectId from the bson package (part of pymongo).
 from bson import ObjectId
+import fitz  # PyMuPDF
+import pdfplumber
+import docx
+from moviepy import VideoFileClip
+
+
+
 
 #Define config for logging
 logging.basicConfig(level=logging.INFO)
@@ -27,6 +34,13 @@ logging.basicConfig(level=logging.INFO)
 app = Flask(__name__)
 #Allow connection with frontend
 CORS(app, origins=['http://localhost:5173'])
+
+
+
+UPLOAD_FOLDER = 'uploads'
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+ALLOWED_EXTENSIONS = {'pdf', 'docx', 'mp4', 'mov'}
+
 
 load_dotenv()
 
@@ -46,6 +60,89 @@ GOOGLE_CSE_ID = os.getenv('GOOGLE_CSE_ID')
 
 # Create a transcriber object.
 transcriber = aai.Transcriber()
+
+#==========================UPLOAD PDF, DOCX========================
+@app.route('/upload_file', methods=['POST'])
+def upload_file():
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file part'}), 400
+
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+
+    #extract the extention of the file and check if it's part of the list defined above
+    ext = file.filename.rsplit('.', 1)[1].lower()
+    if ext not in ALLOWED_EXTENSIONS:
+        return jsonify({'error': 'File type not allowed'}), 400
+
+    try:
+        file_path = os.path.join(UPLOAD_FOLDER, file.filename)
+        file.save(file_path)
+
+        extracted_text = ""
+
+        if ext == 'pdf':
+            extracted_text = extract_pdf(file_path)
+        elif ext == 'docx':
+            extracted_text = extract_docx(file_path)
+        elif ext in ['mp4', 'mov']:
+            extracted_text = transcribe_video(file_path)
+
+        if not extracted_text:
+            return jsonify({'error': 'Failed to extract text'}), 500
+
+        # Continue your existing pipeline:
+        # extract_keywords() -> store in MongoDB
+        content = extract_keywords(extracted_text)
+        document = {
+            'uploadDate': datetime.now(),
+            'topicsCovered': content["subtopics"],
+            'summary': content["summary"],
+            'structuredResources': search_resources(content["subtopics"]),
+            'transcript': extracted_text,
+            'subject': content["subject"],
+            'class': content["class"],
+            'topic': content["topic"],
+        }
+        result = db.Documents.insert_one(document)
+        logging.info(f"Inserted document ID: {result.inserted_id}")
+
+
+        logging.info("Temporary files cleaned up")
+        return jsonify({
+            "success": True,
+            "inserted_id": str(result.inserted_id)
+        })
+    except Exception as e:
+        logging.error(f"An error occurred: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
+    return jsonify({'message': 'File processed successfully', 'extracted_text': extracted_text})
+
+def extract_pdf(path):
+    text = ""
+    with pdfplumber.open(path) as pdf:
+        for page in pdf.pages:
+            text += page.extract_text() + "\n"
+    return text
+
+def extract_docx(path):
+    doc = docx.Document(path)
+    return "\n".join([para.text for para in doc.paragraphs])
+
+def transcribe_video(path):
+    audio_path = path.replace('.mp4', '.wav').replace('.mov', '.wav')
+    clip = VideoFileClip(path)
+    clip.audio.write_audiofile(audio_path)
+    transcript = transcriber.transcribe(audio_path)
+    clean_up(audio_path)
+    return transcript.text
+
+#==========================UPLOAD PDF, DOCX========================
+
+
 
 #Home route
 @app.route("/")
