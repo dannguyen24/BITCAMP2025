@@ -1,6 +1,4 @@
-// src/App.jsx
-
-// Imports! React hooks (useState, useEffect, useCallback, useRef), flushSync for our resize fix, components, and styles!
+// Imports first! React hooks (useState, useEffect, useCallback, useRef), flushSync for our resize fix, components, and styles.
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { flushSync } from 'react-dom'; // Needed for the resize consistency fix.
 import Sidebar from './components/Sidebar'; // Our trusty Sidebar component.
@@ -8,82 +6,26 @@ import ContentDisplay from './components/ContentDisplay'; // Where the stuff sho
 import UploadModal from './components/UploadModal'; // The popup modal for uploads.
 import './App.css'; // Styles, including dark mode. Very important.
 
-// --- !!! MOCK DATA FOR UI TESTING (Updated Structure w/ structuredResources & More Folders) !!! ---
-const mockStructureData = {
-  "Computer Science": {
-    "CS 101 - Intro": { "Course Overview": {}, "Basic Syntax": {}, "Variables & Types": {}, "Control Flow": {}, "Functions": {} },
-    "CS 202 - Data Structures": { "Arrays": {}, "Linked Lists": {}, "Stacks & Queues": {}, "Hash Tables": {}, "Trees": {}, "Graphs": {} },
-    "CS 303 - Algorithms": { "Big O Notation": {}, "Sorting Algorithms": {}, "Searching Algorithms": {}, "Dynamic Programming": {}, "Greedy Algorithms": {} },
-    "CS 404 - Web Dev": { "HTML & CSS": {}, "JavaScript Basics": {}, "React Intro": {}, "Node.js & Express": {} }
-  },
-  "History": {
-    "HIST 110 - US History": { "Colonial Period": {}, "Revolutionary War": {}, "Early Republic": {}, "Civil War": {}, "Reconstruction": {}, "Industrial Age": {} },
-    "HIST 320 - WWII": { "Causes": {}, "Rise of Fascism": {}, "European Theater": {}, "Pacific Theater": {}, "The Holocaust": {}, "Aftermath": {} },
-    "HIST 250 - Ancient Civ": { "Mesopotamia": {}, "Ancient Egypt": {}, "Ancient Greece": {}, "Roman Republic": {}, "Roman Empire": {} }
-  },
-  "Biology": {
-    "BIO 101 - General Bio": { "Scientific Method": {}, "Cell Structure": {}, "Macromolecules": {}, "Metabolism Intro": {}, "Mitochondria": {}, "Photosynthesis": {}, "Cellular Respiration": {} },
-    "BIO 220 - Genetics": { "Mendelian Genetics": {}, "DNA Structure": {}, "Replication & Transcription": {}, "Translation": {}, "Population Genetics": {} },
-    "BIO 330 - Ecology": { "Ecosystems": {}, "Biomes": {}, "Population Dynamics": {}, "Community Interactions": {}, "Conservation Biology": {} }
-  },
-  "Physics": { "PHYS 101 - Mechanics": { "Kinematics": {}, "Newton's Laws": {}, "Work & Energy": {}, "Momentum": {}, "Rotational Motion": {} }, "PHYS 202 - E&M": { "Electric Fields": {}, "Gauss's Law": {}, "Electric Potential": {}, "Capacitance": {}, "Circuits (DC)": {}, "Magnetic Fields": {} } },
-   "Literature": { "LIT 100 - Intro to Lit": { "Poetry Analysis": {}, "Short Stories": {}, "The Novel": {}, "Drama": {} }, "LIT 340 - Shakespeare": { "Hamlet": {}, "Macbeth": {}, "Romeo & Juliet": {}, "Sonnets": {} } },
-    "Economics": { "ECON 101 - Microeconomics": { "Supply and Demand": {}, "Elasticity": {}, "Market Structures": {}, "Consumer Theory": {} }, "ECON 102 - Macroeconomics": { "GDP & Inflation": {}, "Aggregate Demand/Supply": {}, "Monetary Policy": {}, "Fiscal Policy": {} } }
-};
-
-// Updated mock content data with the new 'structuredResources' field!
-// Matches: Subject="Computer Science", Class="CS 202 - Data Structures", Topic="Linked Lists"
-const mockContentData = [
-  {
-    _id: "mockNote1", // Added mock ID for delete testing
-    uploadDate: "2024-03-10T10:00:00Z",
-    topicsCovered: ["Singly Linked Lists", "Node Structure", "Head Pointer", "Traversal"],
-    summary: "Introduced the fundamental concepts of singly linked lists, including node creation, head pointers, and basic list traversal.",
-    structuredResources: [
-      { "topic": "Singly Linked Lists", "googleLink": "https://www.geeksforgeeks.org/linked-list-set-1-introduction/", "youtubeLink": "https://www.youtube.com/watch?v=njTh_OvY_zo" },
-      { "topic": "Node Structure", "googleLink": "https://en.wikipedia.org/wiki/Node_(computer_science)", "youtubeLink": "https://www.youtube.com/watch?v=3_w_mdPyDmY" },
-      { "topic": "Head Pointer", "googleLink": null, "youtubeLink": "https://www.youtube.com/watch?v=FtlF4_XG5Ew" },
-      { "topic": "Traversal", "googleLink": "https://www.programiz.com/dsa/linked-list-traversal", "youtubeLink": null }
-    ],
-    transcript: "Alright class, today we're moving on to a fundamental data structure: the linked list... (Imagine more transcript text here...)"
-  },
-  {
-    _id: "mockNote2", // Added mock ID
-    uploadDate: "2024-03-12T11:30:00Z",
-    topicsCovered: ["Insertion (Head, Tail, Middle)", "Deletion"],
-    summary: "Covered various insertion methods and how to handle node deletion.",
-    structuredResources: [
-       { "topic": "Insertion", "googleLink": "https://www.geeksforgeeks.org/linked-list-set-2-inserting-a-node/", "youtubeLink": "https://www.youtube.com/watch?v=SCDGNqOx4iA" },
-       { "topic": "Deletion", "googleLink": "https://www.geeksforgeeks.org/linked-list-set-3-deleting-node/", "youtubeLink": "https://www.youtube.com/watch?v=HAN_N4IIw0Y" }
-    ],
-    transcript: "Okay, building on our previous lecture, let's talk about modifying..."
-  }
-];
-// --- !!! END MOCK DATA !!! ---
-
-
-// === App Component === Using Mock Data, with Delete Handlers Ready ===
+// === App Component === Handling backend data transformation! ===
 function App() {
   // --- State Definitions (Theme, Modal, Resizing) ---
-  const [theme, setTheme] = useState('dark');
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [sidebarWidth, setSidebarWidth] = useState(280);
-  const [isResizing, setIsResizing] = useState(false);
-  const isResizingRef = useRef(isResizing);
-  useEffect(() => { isResizingRef.current = isResizing; }, [isResizing]);
+  const [theme, setTheme] = useState('dark'); // Defaulting to dark mode.
+  const [isModalOpen, setIsModalOpen] = useState(false); // Upload modal state.
+  const [sidebarWidth, setSidebarWidth] = useState(280); // Sidebar width state.
+  const [isResizing, setIsResizing] = useState(false); // Flag for active resizing.
+  const isResizingRef = useRef(isResizing); // Ref mirrors state for reliable listener checks.
+  useEffect(() => { isResizingRef.current = isResizing; }, [isResizing]); // Keep ref synced.
   const appContainerRef = useRef(null);
   const sidebarRef = useRef(null);
 
-  // --- Core Application State --- Initialize with Mock Data! ---
-  // *** Uses the expanded mockStructureData now! ***
-  const [folderStructure, setFolderStructure] = useState(mockStructureData);
-  const [selectedItem, setSelectedItem] = useState(null); // { subject, class, topic }
-  // *** Content state expects an ARRAY of note objects ***
-  const [currentContent, setCurrentContent] = useState(null); // Array or null
-  const [isLoading, setIsLoading] = useState(false); // General loading
-  const [isDeleting, setIsDeleting] = useState(false); // *** NEW: Specific loading state for deletes ***
-  const [error, setError] = useState(null);
-  // --- End Core State ---
+  // --- Core Application State ---
+  const [folderStructure, setFolderStructure] = useState({}); // Start empty! Will build on fetch.
+  const [selectedItem, setSelectedItem] = useState(null); // { subject, class, topic } or null.
+  const [currentContent, setCurrentContent] = useState(null); // Expects Array of note objects or null.
+  const [isLoading, setIsLoading] = useState(false); // General loading state.
+  const [isDeleting, setIsDeleting] = useState(false); // Specific loading state for delete actions.
+  const [error, setError] = useState(null); // Error message state.
+  // --- End State Definitions ---
 
 
   // --- Theme Management Logic --- (Unchanged) ---
@@ -91,11 +33,9 @@ function App() {
   useEffect(() => { document.body.classList.toggle('dark-mode', theme === 'dark'); try {localStorage.setItem('lectureAppTheme', theme);} catch(e){} }, [theme]);
   const toggleTheme = useCallback(() => { setTheme(prev => (prev === 'light' ? 'dark' : 'light')); }, []);
 
-
   // --- Modal Logic --- (Unchanged) ---
   const openModal = useCallback(() => { setIsModalOpen(true); }, []);
   const closeModal = useCallback(() => { setIsModalOpen(false); }, []);
-
 
   // --- Resizing Logic --- (Unchanged - persistent listeners approach) ---
   const handleMouseMove = useCallback((e) => { if(!isResizingRef.current) return; let nw=e.clientX; nw=Math.max(200,Math.min(600,nw)); setSidebarWidth(nw);}, []);
@@ -104,167 +44,135 @@ function App() {
   const handleMouseDown = useCallback((e) => { e.preventDefault(); flushSync(() => { setIsResizing(true); }); document.body.style.userSelect='none'; document.body.style.cursor='col-resize';}, []);
 
 
-  // --- Data Fetching & Topic Selection Logic --- *** USING MOCK DATA *** ---
+  // --- Data Fetching & Topic Selection Logic --- *** fetchStructure MODIFIED *** ---
 
-  // Fetch folder structure function - Defined but not called initially. Used for refresh.
+  // Fetches data from backend and TRANSFORMS it into the 3-level folder structure.
   const fetchStructure = useCallback(async (calledFrom = 'unknown') => {
-    console.log(`Fetching/Refreshing structure... (MOCK DATA ACTIVE - Call from: ${calledFrom})`);
+    console.log(`Fetching raw data from /api/structure... (Called from: ${calledFrom})`);
     setIsLoading(true); setError(null);
-    await new Promise(resolve => setTimeout(resolve, 100)); // Simulate tiny delay
-    // In a real app, fetch here. In mock mode, maybe reset state if needed, or do nothing.
-    // setFolderStructure(mockStructureData); // Example: Reset to original mock
-    console.log("Structure 'refresh' complete (mock mode).");
-    setIsLoading(false);
-    }, []);
+    try {
+      // --- Fetch the data (expecting an array of notes) ---
+      // TODO: Replace '/api/structure' with `${import.meta.env.VITE_API_BASE_URL}/api/structure` or similar env var.
+      const response = await fetch('/api/structure');
+      if (!response.ok) {
+          let errorMsg = `HTTP error! Status: ${response.status}`;
+           try { const errData = await response.json(); errorMsg = errData.error || errData.message || errorMsg; } catch(e) { /* Ignore if not JSON */ }
+           throw new Error(errorMsg);
+       }
+      const flatNoteList = await response.json(); // Expecting an ARRAY like [{ subject, class, topic, ...}, ...]
+      console.log("Received raw data from /api/structure:", flatNoteList);
 
-  // Initial fetch on mount - *** COMMENTED OUT *** to use mock data right away.
-  useEffect(() => {
-    console.log("App mounted. Using mock structure data. Skipping initial fetch.");
-    // fetchStructure('initialMount'); // <-- BYPASSING fetch on initial load!
-  }, []); // Empty deps still means runs once.
+      // --- !!! DATA TRANSFORMATION LOGIC !!! ---
+      // Check if we actually got an array
+      if (!Array.isArray(flatNoteList)) {
+          console.error("/api/structure did not return an array!", flatNoteList);
+          throw new Error("Invalid structure data format received from server.");
+      }
 
-  // Fetch content effect - *** USES MOCK DATA *** based on selected item.
-  useEffect(() => {
-    console.log("Selection changed:", selectedItem);
-    if (!selectedItem || !selectedItem.subject || !selectedItem.class || !selectedItem.topic) { setCurrentContent(null); return; }
-    console.log("Checking mock data for selected item...");
-    setIsLoading(true); setError(null);
-    // Check if the selection matches our specific mock content key
-    if ( selectedItem.subject === "Computer Science" && selectedItem.class === "CS 202 - Data Structures" && selectedItem.topic === "Linked Lists" ) {
-      console.log("Setting mock content for Linked Lists.");
-      setTimeout(() => { setCurrentContent(mockContentData); setIsLoading(false); }, 300); // Simulate delay
-    } else {
-      console.log("No specific mock content found. Setting empty array.");
-       setTimeout(() => { setCurrentContent([]); setIsLoading(false); }, 300); // Simulate delay
+      // Build the required nested structure
+      const nestedStructure = {};
+      flatNoteList.forEach(note => {
+          // --- IMPORTANT: Use the CORRECT keys from the backend response ---
+          // Adjust these ('subject', 'class', 'topic') if backend uses different names like 'nameClass'
+          const subject = note.subject;
+          const className = note.class; // Assuming backend sends 'class' key
+          const topicName = note.topic; // Assuming backend sends 'topic' key
+
+          // Ensure all parts exist before adding to structure
+          if (subject && className && topicName) {
+              // Create subject level if it doesn't exist
+              if (!nestedStructure[subject]) {
+                  nestedStructure[subject] = {};
+              }
+              // Create class level if it doesn't exist
+              if (!nestedStructure[subject][className]) {
+                  nestedStructure[subject][className] = {};
+              }
+              // Add topic (empty object signifies its existence in the hierarchy)
+              nestedStructure[subject][className][topicName] = {};
+          } else {
+              // Log a warning if a note is missing necessary fields for structuring
+              console.warn("Skipping note in structure due to missing subject/class/topic:", note);
+          }
+      });
+      // --- !!! END TRANSFORMATION LOGIC !!! ---
+
+      console.log("Transformed nested structure for Sidebar:", nestedStructure);
+      setFolderStructure(nestedStructure || {}); // Update state with the *nested* structure!
+
+    } catch (err) {
+      console.error("Fetch or transform structure failed!", err); // Log the error!
+      setError(`Couldn't load lecture structure: ${err.message}.`); // Tell the user!
+      setFolderStructure({}); // Reset structure on error!
+    } finally {
+      setIsLoading(false); // Done loading.
     }
-  }, [selectedItem]); // Re-run when selectedItem changes!
+  }, []); // Stable function identity.
 
+  // Initial fetch on mount - Runs the modified fetchStructure.
+  useEffect(() => {
+    console.log("App mounted. Fetching initial structure data from backend.");
+    fetchStructure('initialMount');
+  }, [fetchStructure]); // Dependency array includes fetchStructure
 
-  // Handle topic clicks from Sidebar - (Unchanged).
+  // Fetch content effect - Assumes /api/content returns the CORRECT array format needed by ContentDisplay.
+  useEffect(() => {
+    if (!selectedItem || !selectedItem.subject || !selectedItem.class || !selectedItem.topic) { setCurrentContent(null); return; }
+    const fetchContent = async () => {
+      console.log("Selection changed. Fetching content for:", selectedItem);
+      setIsLoading(true); setError(null); setCurrentContent(null);
+      try {
+        const { subject, class: className, topic } = selectedItem;
+        // TODO: Replace base URL with env var
+        const apiUrl = `/api/content?subject=${encodeURIComponent(subject)}&class=${encodeURIComponent(className)}&topic=${encodeURIComponent(topic)}`;
+        console.log("Fetching content from:", apiUrl);
+        const response = await fetch(apiUrl);
+        if (!response.ok) { throw new Error(`HTTP ${response.status}`); }
+        const data = await response.json();
+        if (!Array.isArray(data)) { throw new Error("Invalid content data format"); }
+        console.log("Received content data:", data);
+        setCurrentContent(data); // Update state with the array!
+      } catch (err) {
+        console.error("Fetch content failed.", err);
+        setError(`Couldn't load content: ${err.message}`);
+        setCurrentContent(null);
+      } finally { setIsLoading(false); }
+    };
+    fetchContent();
+  }, [selectedItem]);
+
+  // Handle topic clicks from Sidebar (Unchanged - uses internal state keys).
   const handleSelectTopic = useCallback((subject, className, topic) => { console.log(`Topic selected: ${subject}/${className}/${topic}`); const newItem={subject, class: className, topic}; if(selectedItem?.subject!==subject || selectedItem?.class !== className || selectedItem?.topic !== topic){setSelectedItem(newItem);} else { console.log("...same topic selected."); }}, [selectedItem]);
 
 
-  // --- !!! DELETE HANDLERS (Mock Aware) !!! --- Structure is here, calls won't delete real data. ---
-
-  // Generic Delete Function (Helper) - Skips API call in mock mode.
+  // --- Delete Handlers --- (Ensure URLs match backend!)
+  // Generic Delete Function (Helper)
   const performDelete = async (url, itemDescription, successCallback) => {
-    if (!window.confirm(`Are you sure you want to delete "${itemDescription}"? This action cannot be undone.`)) {
-      console.log("Delete cancelled by user for:", itemDescription);
-      return;
-    }
-    console.log(`MOCK DELETE: Would attempt DELETE on ${url} for "${itemDescription}"`);
+    if (!window.confirm(`Are you sure you want to delete "${itemDescription}"? This action cannot be undone.`)) { return; }
+    console.log(`Attempting to DELETE: ${url}`);
     setIsDeleting(true); setError(null);
-    // --- SIMULATE API CALL DELAY ---
-    await new Promise(resolve => setTimeout(resolve, 500));
-    // --- END SIMULATION ---
-    // In real mode, check response here. In mock mode, assume success for UI testing.
-    console.log(`MOCK DELETE: Successfully 'deleted': ${itemDescription}`);
-    alert(`"${itemDescription}" deleted successfully (Mock Mode).`);
-    if (successCallback) { successCallback(); } // Run refresh logic
-    setIsDeleting(false);
-    // --- Error handling omitted for mock mode simplicity ---
-  };
-
-  // Handler for deleting a specific note entry - Modifies mock content state.
-  const handleDeleteNote = useCallback(async (noteId, noteIdentifier = 'this note') => {
-    console.log(`MOCK DELETE: Requesting delete for note ID: ${noteId}`);
-    if (!noteId) { console.error("handleDeleteNote called without noteId!"); return; }
-    const url = `/api/notes/${noteId}`; // URL for real backend
-
-    await performDelete(url, noteIdentifier, () => {
-      // --- MOCK STATE UPDATE --- Remove the note from currentContent if it exists
-      setCurrentContent(prevContent => {
-          if (!prevContent) return null;
-          const updatedContent = prevContent.filter(note => note._id !== noteId);
-          console.log("MOCK DELETE: Updated currentContent state:", updatedContent);
-          // If content becomes empty, show placeholder; otherwise show remaining notes.
-          return updatedContent.length > 0 ? updatedContent : [];
-      });
-      // No need to refetch structure in mock mode unless simulating.
-    });
-  }, []); // No dependency on selectedItem needed for mock state update
-
-  // Handler for deleting a topic folder - Modifies mock structure state.
-  const handleDeleteTopic = useCallback(async (subject, className, topic) => {
-    console.log(`MOCK DELETE: Requesting delete for topic: ${subject}/${className}/${topic}`);
-    const url = `/api/topics?subject=${encodeURIComponent(subject)}&class=${encodeURIComponent(className)}&topic=${encodeURIComponent(topic)}`;
-    const description = `Topic: ${topic}`;
-
-    await performDelete(url, description, () => {
-      // --- MOCK STATE UPDATE --- Remove topic from folderStructure
-      setFolderStructure(prevStructure => {
-          const newStructure = JSON.parse(JSON.stringify(prevStructure)); // Deep copy
-          if (newStructure[subject]?.[className]) {
-              delete newStructure[subject][className][topic];
-              // Optionally delete class/subject if they become empty
-              if (Object.keys(newStructure[subject][className]).length === 0) {
-                  delete newStructure[subject][className];
-                  if (Object.keys(newStructure[subject]).length === 0) {
-                      delete newStructure[subject];
-                  }
-              }
-               console.log("MOCK DELETE: Updated folderStructure state:", newStructure);
-              return newStructure;
-          }
-          return prevStructure; // No change if path didn't exist
-      });
-      // If the deleted topic was selected, clear selection & content.
-      if (selectedItem?.subject === subject && selectedItem?.class === className && selectedItem?.topic === topic) {
-        setSelectedItem(null);
-        setCurrentContent(null);
+    try {
+      // TODO: Prepend base URL from env var if needed
+      const response = await fetch(url, { method: 'DELETE' });
+      if (!response.ok) {
+          let errorMsg = `HTTP error! Status: ${response.status}`;
+          try { const errData = await response.json(); errorMsg = errData.error || errData.message || errorMsg; } catch (e) {}
+          throw new Error(errorMsg);
       }
-    });
-  }, [selectedItem]); // Depend on selectedItem to clear it
-
-  // Handler for deleting a class folder - Modifies mock structure state.
-  const handleDeleteClass = useCallback(async (subject, className) => {
-     console.log(`MOCK DELETE: Requesting delete for class: ${subject}/${className}`);
-     const url = `/api/classes?subject=${encodeURIComponent(subject)}&class=${encodeURIComponent(className)}`;
-     const description = `Class: ${className}`;
-
-     await performDelete(url, description, () => {
-         // --- MOCK STATE UPDATE --- Remove class from folderStructure
-         setFolderStructure(prevStructure => {
-             const newStructure = JSON.parse(JSON.stringify(prevStructure)); // Deep copy
-             if (newStructure[subject]) {
-                 delete newStructure[subject][className];
-                 if (Object.keys(newStructure[subject]).length === 0) {
-                     delete newStructure[subject];
-                 }
-                 console.log("MOCK DELETE: Updated folderStructure state:", newStructure);
-                 return newStructure;
-             }
-             return prevStructure;
-         });
-         // If the deleted class contained the selected topic, clear selection.
-         if (selectedItem?.subject === subject && selectedItem?.class === className) {
-            setSelectedItem(null);
-            setCurrentContent(null);
-         }
-     });
-  }, [selectedItem]);
-
-  // Handler for deleting a subject folder - Modifies mock structure state.
-  const handleDeleteSubject = useCallback(async (subject) => {
-      console.log(`MOCK DELETE: Requesting delete for subject: ${subject}`);
-      const url = `/api/subjects?subject=${encodeURIComponent(subject)}`;
-      const description = `Subject: ${subject}`;
-
-      await performDelete(url, description, () => {
-          // --- MOCK STATE UPDATE --- Remove subject from folderStructure
-          setFolderStructure(prevStructure => {
-              const newStructure = JSON.parse(JSON.stringify(prevStructure)); // Deep copy
-              delete newStructure[subject];
-              console.log("MOCK DELETE: Updated folderStructure state:", newStructure);
-              return newStructure;
-          });
-         // If the deleted subject contained the selected item, clear selection.
-          if (selectedItem?.subject === subject) {
-              setSelectedItem(null);
-              setCurrentContent(null);
-          }
-      });
-  }, [selectedItem]);
+      console.log(`Successfully deleted: ${itemDescription}`);
+      alert(`"${itemDescription}" deleted successfully.`);
+      if (successCallback) { successCallback(); }
+    } catch (err) {
+      console.error(`Failed to delete ${itemDescription}:`, err);
+      setError(`Failed to delete "${itemDescription}": ${err.message}`);
+      alert(`Error deleting "${itemDescription}": ${err.message}`);
+    } finally { setIsDeleting(false); }
+  };
+  // Specific Delete Handlers
+  const handleDeleteNote = useCallback(async (noteId, noteIdentifier = 'this note') => { const url = `/delete_document/${noteId}`; /* TODO: Base URL */ await performDelete(url, noteIdentifier, () => { if (selectedItem) { const currentSelection = { ...selectedItem }; setSelectedItem(null); setTimeout(() => setSelectedItem(currentSelection), 0); } }); }, [selectedItem]);
+  const handleDeleteTopic = useCallback(async (subject, className, topic) => { const url = `/api/topics?subject=${encodeURIComponent(subject)}&class=${encodeURIComponent(className)}&topic=${encodeURIComponent(topic)}`; /* TODO: Base URL */ const desc = `Topic: ${topic}`; await performDelete(url, desc, () => { if (selectedItem?.subject === subject && selectedItem?.class === className && selectedItem?.topic === topic) { setSelectedItem(null); setCurrentContent(null); } fetchStructure('afterTopicDelete'); }); }, [selectedItem, fetchStructure]);
+  const handleDeleteClass = useCallback(async (subject, className) => { const url = `/api/classes?subject=${encodeURIComponent(subject)}&class=${encodeURIComponent(className)}`; /* TODO: Base URL */ const desc = `Class: ${className}`; await performDelete(url, desc, () => { if (selectedItem?.subject === subject && selectedItem?.class === className) { setSelectedItem(null); setCurrentContent(null); } fetchStructure('afterClassDelete'); }); }, [selectedItem, fetchStructure]);
+  const handleDeleteSubject = useCallback(async (subject) => { const url = `/api/subjects?subject=${encodeURIComponent(subject)}`; /* TODO: Base URL */ const desc = `Subject: ${subject}`; await performDelete(url, desc, () => { if (selectedItem?.subject === subject) { setSelectedItem(null); setCurrentContent(null); } fetchStructure('afterSubjectDelete'); }); }, [selectedItem, fetchStructure]);
   // --- End Delete Handlers ---
 
 
@@ -277,27 +185,27 @@ function App() {
       {/* Main app layout container */}
       <div className={`app-container ${isDeleting ? 'deleting' : ''}`} ref={appContainerRef}>
 
-        {/* Sidebar Component - Pass mock structure and delete handlers */}
+        {/* Sidebar Component - Pass the *transformed* nested structure */}
         <Sidebar
           ref={sidebarRef}
           style={{ width: `${sidebarWidth}px` }}
-          structure={folderStructure}
+          structure={folderStructure} // Pass the structure built by fetchStructure
           onSelectTopic={handleSelectTopic}
           selectedItem={selectedItem}
           onResizeMouseDown={handleMouseDown}
           onOpenUploadModal={openModal}
-          onDeleteSubject={handleDeleteSubject} // Pass delete handler
-          onDeleteClass={handleDeleteClass}   // Pass delete handler
-          onDeleteTopic={handleDeleteTopic}   // Pass delete handler
+          onDeleteSubject={handleDeleteSubject}
+          onDeleteClass={handleDeleteClass}
+          onDeleteTopic={handleDeleteTopic}
         />
 
-        {/* Content Display Component - Pass mock content and delete handler */}
+        {/* Content Display Component - Pass the array fetched from /api/content */}
         <ContentDisplay
           content={currentContent}
           selectedItem={selectedItem}
-          isLoading={isLoading && !isDeleting} // Adjust loading display
+          isLoading={isLoading && !isDeleting}
           error={error}
-          onDeleteNote={handleDeleteNote} // Pass delete handler
+          onDeleteNote={handleDeleteNote}
         />
 
       </div> {/* End app-container */}
@@ -308,7 +216,7 @@ function App() {
         {theme === 'light' ? '🌙' : '☀️'}
       </button>
 
-      {/* Upload Modal - onUploadSuccess calls the mock-aware fetchStructure */}
+      {/* Upload Modal */}
       <UploadModal isOpen={isModalOpen} onClose={closeModal} onUploadSuccess={() => fetchStructure('afterUpload')} />
 
     </> // End React Fragment
