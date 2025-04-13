@@ -48,24 +48,24 @@ function App() {
 
   // Fetches data from backend and TRANSFORMS it into the 3-level folder structure.
   const fetchStructure = useCallback(async (calledFrom = 'unknown') => {
-    console.log(`Fetching raw data from /api/structure... (Called from: ${calledFrom})`);
+    console.log(`Fetching raw data from /transcripts...`);
     setIsLoading(true); setError(null);
     try {
       // --- Fetch the data (expecting an array of notes) ---
       // TODO: Replace '/api/structure' with `${import.meta.env.VITE_API_BASE_URL}/api/structure` or similar env var.
-      const response = await fetch('/api/structure');
+      const response = await fetch('http://127.0.0.1:5000/transcripts');
       if (!response.ok) {
           let errorMsg = `HTTP error! Status: ${response.status}`;
            try { const errData = await response.json(); errorMsg = errData.error || errData.message || errorMsg; } catch(e) { /* Ignore if not JSON */ }
            throw new Error(errorMsg);
        }
       const flatNoteList = await response.json(); // Expecting an ARRAY like [{ subject, class, topic, ...}, ...]
-      console.log("Received raw data from /api/structure:", flatNoteList);
+      console.log("Received raw data from http://127.0.0.1:5000/transcripts:", flatNoteList);
 
       // --- !!! DATA TRANSFORMATION LOGIC !!! ---
       // Check if we actually got an array
       if (!Array.isArray(flatNoteList)) {
-          console.error("/api/structure did not return an array!", flatNoteList);
+          console.error("http://127.0.0.1:5000/transcripts/ did not return an array!", flatNoteList);
           throw new Error("Invalid structure data format received from server.");
       }
 
@@ -124,7 +124,7 @@ function App() {
       try {
         const { subject, class: className, topic } = selectedItem;
         // TODO: Replace base URL with env var
-        const apiUrl = `/api/content?subject=${encodeURIComponent(subject)}&class=${encodeURIComponent(className)}&topic=${encodeURIComponent(topic)}`;
+        const apiUrl = `/content?subject=${encodeURIComponent(subject)}&class=${encodeURIComponent(className)}&topic=${encodeURIComponent(topic)}`;
         console.log("Fetching content from:", apiUrl);
         const response = await fetch(apiUrl);
         if (!response.ok) { throw new Error(`HTTP ${response.status}`); }
