@@ -7,3 +7,4 @@ dotenv
 yt_dlp
 datetime
 requests
+bson

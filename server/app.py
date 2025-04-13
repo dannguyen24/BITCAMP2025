@@ -18,6 +18,9 @@ import re
 #import google generative
 import google.generativeai as gen_ai
 
+#Import ObjectId from the bson package (part of pymongo).
+from bson import ObjectId
+
 #Define config for logging
 logging.basicConfig(level=logging.INFO)
 
@@ -83,7 +86,19 @@ def test():
         return jsonify(doc), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
+    
+@app.route("/delete_document/<_id>", methods=['DELETE'])
+def delete_document(_id):
+    try:
+        result = 0
+        result = db.Documents.delete_one({"_id": ObjectId(_id)}) # {"_id": ObjectId("4d512b45cc9374271b02ec4f")
+        if result.deleted_count == 0:
+            return jsonify({"error": "Document not found"}), 404
+        return jsonify({"message": "Document deleted successfully"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+   
+   
 #Download audio from the video uploaded
 def download_audio(video_url, output_path):
     ydl_opts = {
@@ -168,7 +183,6 @@ def google_search(query, site_restrict=None):
         return {}
 
 def search_resources(subtopics):
-
     # final_resources = {}
     topic_resources = []
     # subtopics = ["Singly Linked Lists", "Node Structure", "Head Pointer", "Traversal"]
