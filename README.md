@@ -55,7 +55,6 @@ Built for the BitCamp 2025 Hackathon!
 **Deployment (Planned/Actual):**
 
 *   **Target Domain:** `studyeasy.tech`
-*   **Infrastructure:** *Specify your chosen hosting (e.g., AWS EC2, Render, Netlify+Render, etc.)*
 
 ## Setup and Installation (Local Development)
 
@@ -159,11 +158,6 @@ Follow these steps to get a local copy up and running.
 *   **Sharing:** Allow users to share notes or summaries.
 *   **UI/UX Polish:** Further refine loading states, error handling, transitions, and visual design.
 *   **More AI Features:** Explore sentiment analysis, keyword highlighting, chapter generation within transcripts.
-
-## License
-
-*(Optional: Choose a license)*
-This project is licensed under the MIT License - see the LICENSE.md file for details.
 
 ## Acknowledgements
 
