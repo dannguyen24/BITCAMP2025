@@ -141,7 +141,7 @@ Follow these steps to get a local copy up and running.
 
 ## Team Members (BitCamp 2025)
 
-*   Dan Nyugen
+*   Dan Nguyen
 *   Abdullah Ali
 *   Michelle Eileen
 *   Sesha Sai Lakkavajjala
