@@ -1,7 +1,9 @@
 # Python virtual environment
 venv/
 __pycache__/
+.env
 *.pyc
+node_modules/
 
 # Flask specific
 instance/
@@ -12,6 +14,7 @@ instance/
 # VS Code and IDEs
 .vscode/
 .idea/
+
 
 # Logs and uploads
 *.log
