@@ -8,3 +8,5 @@ yt_dlp
 datetime
 requests
 bson
+firebase-admin
+flask-jwt-extended

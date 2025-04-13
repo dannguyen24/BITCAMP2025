@@ -59,9 +59,9 @@ function FileUpload({ onUploadSuccess }) {
     try {
       // For URL, we send JSON data, not FormData!
       const payload = { url: urlInput.trim() }; // Send an object with a 'url' key! Trim whitespace!
-      const res = await axios.post('http://localhost:5000/upload_link', payload, {
-        headers: { 'Content-Type': 'application/json' }, // Tell backend it's JSON! IMPORTANT!
-      });
+      alert('Submitting URL: ' + payload.url); // Alert the user what we're doing!
+      console.log("Payload for URL submission:", payload);
+      const res = await axios.post('http://localhost:5000/upload_link', {"link": payload.url});
       console.log("URL submission response:", res.data);
       alert('URL submitted successfully! 👍 Backend says: ' + res.data);
       if (onUploadSuccess) onUploadSuccess(); // Tell App.jsx to refresh!

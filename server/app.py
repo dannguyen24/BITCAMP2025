@@ -78,14 +78,11 @@ def get_transcripts():
         doc["_id"] = str(doc["_id"])  # Make it JSON serializable
     return jsonify(documents)
 
-
-@app.route("/test", methods=['GET'])
-def test():
-    try:
-        doc = db.Documents.find()
-        return jsonify(doc), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+@app.route('/transcripts/<_id>', methods=['GET'])
+def get_transcripts(_id):
+    document=db.Documents.find_one({"_id": ObjectId(_id)})
+  
+    return document
     
 @app.route("/delete_document/<_id>", methods=['DELETE'])
 def delete_document(_id):
