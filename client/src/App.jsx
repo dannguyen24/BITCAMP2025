@@ -124,7 +124,7 @@ function App() {
       try {
         const { subject, class: className, topic } = selectedItem;
         // TODO: Replace base URL with env var
-        const apiUrl = `/content?subject=${encodeURIComponent(subject)}&class=${encodeURIComponent(className)}&topic=${encodeURIComponent(topic)}`;
+        const apiUrl = `http://127.0.0.1:5000/content?subject=${encodeURIComponent(subject)}&class=${encodeURIComponent(className)}&topic=${encodeURIComponent(topic)}`;
         console.log("Fetching content from:", apiUrl);
         const response = await fetch(apiUrl);
         if (!response.ok) { throw new Error(`HTTP ${response.status}`); }

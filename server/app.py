@@ -78,11 +78,38 @@ def get_all_transcripts():
         doc["_id"] = str(doc["_id"])  # Make it JSON serializable
     return jsonify(documents)
 
-@app.route('/transcripts/<_id>', methods=['GET'])
-def get_transcript(_id):
-    document=db.Documents.find_one({"_id": ObjectId(_id)})
-  
-    return document
+
+@app.route('/content', methods=['GET'])
+def get_content_by_subject_class_topic():
+    try:
+        # Extract query params
+        subject = request.args.get('subject')
+        class_name = request.args.get('class')
+        topic = request.args.get('topic')
+
+        # Basic validation
+        if not subject or not class_name or not topic:
+            return jsonify({"error": "Missing subject, class, or topic"}), 400
+
+        # Query MongoDB
+        query = {
+            "subject": subject,
+            "class": class_name,
+            "topic": topic
+        }
+        print(f"Querying MongoDB with: {query}")
+        results = list(db.Documents.find(query))
+
+        # Convert ObjectId to string for frontend compatibility
+        for r in results:
+            r['_id'] = str(r['_id'])
+
+        return jsonify(results), 200
+
+    except Exception as e:
+        print("Error in /content:", str(e))
+        return jsonify({"error": str(e)}), 500
+
     
 @app.route("/delete_document/<_id>", methods=['DELETE'])
 def delete_document(_id):
