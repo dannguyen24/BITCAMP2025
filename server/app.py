@@ -1,15 +1,6 @@
 #from flask import Flask, request, jsonify
 from flask_cors import CORS
 
-#
-#NEED TO IMPORT IN TERMINAL
-
-#pip install python-docx
-#pip install PyMuPDF
-#pip install pdfplumber
-#pip install moviepy
-#
-
 from flask import request, jsonify
 import os
 import fitz  # PyMuPDF
