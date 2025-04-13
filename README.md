@@ -40,7 +40,6 @@ Built for the BitCamp 2025 Hackathon!
 *   **Environment:** `python-dotenv`
 *   **Audio Download:** `yt-dlp`
 *   **Database:** MongoDB (likely via `pymongo`)
-*   **WSGI Server (for Production):** Gunicorn recommended
 
 **AI Services:**
 
