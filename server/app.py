@@ -72,14 +72,14 @@ def upload_link():
         return jsonify({"error": str(e)}), 500
 
 @app.route('/transcripts', methods=['GET'])
-def get_transcripts():
+def get_all_transcripts():
     documents = list(db.Documents.find())
     for doc in documents:
         doc["_id"] = str(doc["_id"])  # Make it JSON serializable
     return jsonify(documents)
 
 @app.route('/transcripts/<_id>', methods=['GET'])
-def get_transcripts(_id):
+def get_transcript(_id):
     document=db.Documents.find_one({"_id": ObjectId(_id)})
   
     return document
