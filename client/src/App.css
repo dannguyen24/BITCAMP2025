@@ -1,4 +1,3 @@
-/* src/App.css */
 /* Let's get some nice fonts! Poppins is pretty cool! Downloaded from Google Fonts! */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
 
@@ -77,7 +76,14 @@ body {
   height: 100vh; /* Full viewport height! */
   overflow: hidden; /* Prevent scrollbars on the container itself */
   gap: 15px; /* Adjust this value for desired spacing! */
+  transition: opacity 0.3s ease; /* Add transition for deleting overlay */
 }
+/* Style to apply when deleting is in progress */
+.app-container.deleting {
+  opacity: 0.7; /* Dim the background slightly */
+  pointer-events: none; /* Prevent interaction with main app */
+}
+
 
 /* --- Sidebar Styles --- The Navigator! Using Variables! --- */
 .sidebar {
@@ -103,190 +109,88 @@ body {
 .subject-list, .class-list, .topic-list { list-style: none; padding: 0; margin: 0; }
 .subject-item, .class-item { margin-bottom: 5px; /* Reduced margin slightly */ } /* Reduced margin */
 
-/* === Styles for Clickable Headers (Subjects and Classes) === */
-.clickable-header {
-  cursor: pointer; /* Make it look clickable! */
-  padding: 4px 5px; /* Add some padding for easier clicking */
-  border-radius: 4px; /* Optional: slight rounding */
-  transition: background-color 0.15s ease; /* Subtle hover feedback */
-  display: flex; /* Align arrow and text */
-  align-items: center; /* Vertically center arrow and text */
-  /* Ensure it takes full available width within its parent list item maybe? */
-  /* width: 100%; box-sizing: border-box; */ /* Optional: if alignment seems off */
-}
-.clickable-header:hover {
-   background-color: var(--accent-tertiary); /* Use lightest purple for hover */
-}
-body.dark-mode .clickable-header:hover {
-    background-color: #3a3a4e; /* Use dark hover color */
-}
+/* Clickable Headers (Subjects and Classes) */
+.clickable-header { cursor: pointer; padding: 4px 5px; border-radius: 4px; transition: background-color 0.15s ease; display: flex; align-items: center; /* Ensure alignment */ }
+.clickable-header:hover { background-color: var(--accent-tertiary); }
+body.dark-mode .clickable-header:hover { background-color: #3a3a4e; }
 
-/* === Arrow Styling === For collapsible headers */
-.sidebar-arrow {
-  display: inline-block; /* Allow transform */
-  margin-right: 6px; /* Space between arrow and text */
-  font-size: 0.7em; /* Make arrow smaller */
-  transition: transform 0.2s ease-in-out; /* Smooth rotation! */
-  transform: rotate(0deg); /* Default: pointing right (collapsed) */
-  color: var(--text-secondary); /* Use secondary text color for less emphasis */
-}
-/* Rotate arrow when the header is expanded (using class or attribute) */
-.clickable-header[aria-expanded="true"] .sidebar-arrow, /* Handle direct state */
-.sidebar-arrow.expanded { /* Handle class-based state if preferred */
-    transform: rotate(90deg); /* Point down when expanded! */
-}
+/* Arrow Styling */
+.sidebar-arrow { display: inline-block; margin-right: 6px; font-size: 0.7em; transition: transform 0.2s ease-in-out; transform: rotate(0deg); color: var(--text-secondary); }
+.clickable-header[aria-expanded="true"] .sidebar-arrow, .sidebar-arrow.expanded { transform: rotate(90deg); }
 
-/* Subject Header Styles (Now part of clickable header) */
-.subject-header {
-  font-weight: 600; /* Bolder subjects */
-  color: var(--text-primary); /* Use primary text color */
-  font-size: 1.1em;
-  /* Removed margin-bottom, padding handles spacing now */
-  /* Removed padding-left, handled by clickable-header padding */
-}
-.class-list { padding-left: 15px; /* Keep indent for classes */ }
-/* Class Header Styles (Now part of clickable header) */
-.class-header {
-  font-weight: 500; /* Slightly less bold than subject */
-  color: var(--text-primary);
-  font-size: 1.0em; /* Slightly smaller */
-  /* Removed margin-bottom, padding handles spacing now */
-  /* Removed padding-left, handled by clickable-header padding */
-}
-.topic-list { padding-left: 15px; /* Keep indent for topics */ }
+/* Subject Header Styles (Applied within clickable-header) */
+.subject-header { font-weight: 600; color: var(--text-primary); font-size: 1.1em; }
+.class-list { padding-left: 15px; }
+/* Class Header Styles (Applied within clickable-header) */
+.class-header { font-weight: 500; color: var(--text-primary); font-size: 1.0em; }
+.topic-list { padding-left: 15px; }
 /* Topic Item Styles */
-.topic-item {
-  padding: 6px 10px; margin-bottom: 4px; border-radius: 5px; cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease;
-  font-size: 0.9em; /* Smallest text */
-  word-break: break-word; /* Break long names */
-  color: var(--text-primary);
-  /* Add left margin to align with header text (after arrow space) */
-  margin-left: 14px; /* Adjust this based on arrow size + margin-right */
-}
-/* Topic Item Hover/Selected States - With Dark Mode Adjustments! */
+.topic-item { padding: 6px 10px; border-radius: 5px; cursor: pointer; transition: background-color 0.2s ease, color 0.2s ease; font-size: 0.9em; word-break: break-word; color: var(--text-primary); }
+/* Topic Item Hover/Selected States */
 .topic-item:hover { background-color: var(--accent-tertiary); color: var(--text-primary); }
 body.dark-mode .topic-item:hover { background-color: #3a3a4e; color: var(--text-primary); }
 .topic-item.selected { background-color: var(--accent-secondary); color: var(--text-on-accent); font-weight: 500; }
 body.dark-mode .topic-item.selected { background-color: var(--accent-primary); color: var(--text-on-accent); }
 
+/* Container for Subject/Class/Topic items + Delete Button */
+.subject-header-container, .class-header-container, .topic-item-container { display: flex; align-items: center; justify-content: space-between; padding-right: 5px; box-sizing: border-box; position: relative; }
+.clickable-header.subject-header-container, .clickable-header.class-header-container { /* Inherits padding/hover */ }
+/* Topic container adjustments */
+.topic-item-container { margin-bottom: 4px; border-radius: 5px; margin-left: 14px; /* Keep overall indent */ padding: 0; /* Remove padding from container */ }
+.topic-item-container:hover { /* Maybe highlight container slightly? */ /* background-color: rgba(0,0,0,0.02); */ }
+body.dark-mode .topic-item-container:hover { /* background-color: rgba(255,255,255,0.02); */ }
+/* Apply selected style to container */
+.topic-item-container.selected { background-color: var(--accent-secondary); }
+body.dark-mode .topic-item-container.selected { background-color: var(--accent-primary); }
+/* Ensure topic text itself doesn't get weird background */
+.topic-item-container .topic-item { margin-left: 0; flex-grow: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.topic-item-container.selected .topic-item { background-color: transparent !important; color: var(--text-on-accent) !important; }
+.topic-item-container:hover .topic-item:not(.selected) { background-color: transparent; } /* Prevent item hover when container hovers maybe? */
+
+
+/* Header content wrapper (Arrow + Text) */
+.header-content { display: flex; align-items: center; flex-grow: 1; min-width: 0; }
+.header-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; /* Handle long names */ }
+
+
 /* --- Styles for the INVISIBLE Resizer Handle INSIDE Sidebar --- Adjusted for GAP --- */
-.sidebar-border-handle {
-  position: absolute; top: 0; bottom: 0;
-  right: -5px; /* Start slightly overlapping the edge into the gap */
-  width: 10px; /* Keep it reasonably wide */
-  cursor: col-resize; z-index: 10;
-  /* background-color: rgba(0, 255, 0, 0.1); */ /* DEBUG */
-}
-/* Optional Dark Mode Hover */
+.sidebar-border-handle { position: absolute; top: 0; bottom: 0; right: -5px; width: 10px; cursor: col-resize; z-index: 10; }
 body.dark-mode .sidebar-border-handle:hover { /* background-color: rgba(255, 255, 255, 0.05); */ }
 /* --- End Invisible Handle Styles --- */
 
 
 /* --- Content Display Area Styles --- Where the good stuff is! Using Variables! --- */
-.content-display {
-  flex-grow: 1; /* Takes up remaining space */
-  padding: 40px; /* Slightly Increased Padding */
-  overflow-y: auto; /* Allow scroll */
-  background-color: var(--bg-primary); /* Themed background */
-  min-width: 300px; /* Prevent squishing */
-  transition: background-color 0.3s ease; /* Smooth theme change */
-  /* --- NO margin-left needed here anymore because .app-container has gap! --- */
-}
+.content-display { flex-grow: 1; padding: 40px; overflow-y: auto; background-color: var(--bg-primary); min-width: 300px; transition: background-color 0.3s ease; /* NO margin-left */ }
 
 /* Placeholder/Loading/Error Styles */
-.placeholder, .loading, .error { display: flex; justify-content: center; align-items: center; height: calc(100% - 80px); /* Adjusted for increased padding */ font-size: 1.2em; color: var(--text-secondary); text-align: center; padding-left: 40px; padding-right: 40px; box-sizing: border-box; }
-.error { color: #c0392b; }
-body.dark-mode .error { color: #e74c3c; }
+.placeholder, .loading, .error { display: flex; justify-content: center; align-items: center; height: calc(100% - 80px); font-size: 1.2em; color: var(--text-secondary); text-align: center; padding-left: 40px; padding-right: 40px; box-sizing: border-box; }
+.error { color: #c0392b; } body.dark-mode .error { color: #e74c3c; }
 .loading { /* Could add spinner */ }
 
 /* --- Note Entry Styles --- Increasing sizes/spacing! --- */
-.note-entry { /* Style for the card holding ONE note's info */
-   /* Inherits from .content-section (which now has transparent bg) */
-   margin-bottom: 60px; /* INCREASED space AFTER each note card */
-}
-
-.note-date { /* Style for the date */
-  font-size: 0.95em; /* Slightly Larger Date Font */
-  color: var(--text-secondary); /* Use secondary text color */
-  margin-bottom: 30px; /* INCREASED space below date */
-  text-align: right; /* Align date to the right */
-}
-
-.note-subsection { /* Container for Topics Covered, Summary, etc. */
-  margin-bottom: 35px; /* INCREASED space BETWEEN subsections */
-}
-/* Make the last subsection have less margin */
-.note-entry .note-subsection:last-child {
-    margin-bottom: 25px; /* Keep last one slightly tighter */
-}
-
-.note-subsection h4 { /* Style for subsection titles */
-  margin-top: 0; margin-bottom: 15px; /* INCREASED space below title */
-  color: var(--accent-primary); /* Use primary accent color */
-  font-size: 1.15em; /* Slightly Larger Title Font */
-  border-bottom: 1px dashed var(--border-primary); /* Dashed line separator */
-  padding-bottom: 8px; /* Slightly more padding */ display: inline-block;
-}
-
-.note-subsection ul { /* List style for Topics Covered array */
-   list-style: disc; padding-left: 30px; /* Increased indent */
-   margin: 0 0 10px 0; /* Increased bottom margin */
-   font-size: 1em; /* Larger List Item Font */
-   line-height: 1.7; /* Increased Spacing */
-}
-
-.note-subsection p { /* Paragraph style for Summary etc. */
-   margin: 0; font-size: 1em; /* Larger Paragraph Font */ line-height: 1.7; /* Increased Spacing */
-}
-
+.note-entry { /* Style for the card holding ONE note's info */ margin-bottom: 0; } /* Remove bottom margin, use divider padding */
+.note-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 25px; } /* Container for date/delete */
+.note-date { font-size: 0.95em; color: var(--text-secondary); margin-bottom: 0; margin-left: 15px; text-align: right; flex-shrink: 0; }
+.note-subsection { margin-bottom: 35px; } .note-entry .note-subsection:last-child { margin-bottom: 25px; }
+.note-subsection h4 { margin-top: 0; margin-bottom: 15px; color: var(--accent-primary); font-size: 1.15em; border-bottom: 1px dashed var(--border-primary); padding-bottom: 8px; display: inline-block; }
+.note-subsection ul { list-style: disc; padding-left: 30px; margin: 0 0 10px 0; font-size: 1em; line-height: 1.7; }
+.note-subsection p { margin: 0; font-size: 1em; line-height: 1.7; }
 /* Content Sections (Base card style for .note-entry) - Made transparent */
-.content-section {
-  background-color: transparent; /* Make card background transparent */
-  padding: 0; /* Remove padding from here, applied to subsections/parent */
-  border-radius: 0; margin-bottom: 0; box-shadow: none;
-  transition: background-color 0.3s ease;
-  width: 100%; box-sizing: border-box;
-}
+.content-section { background-color: transparent; padding: 0; border-radius: 0; margin-bottom: 0; box-shadow: none; transition: background-color 0.3s ease; width: 100%; box-sizing: border-box; }
 
 /* Resources/Transcript Area Styles - Now acts like the card */
-.resources-area, .transcript-area {
-  white-space: pre-wrap; word-wrap: break-word;
-  font-size: 1em; /* Larger Font */ line-height: 1.7; /* Increased Spacing */
-  color: var(--text-primary); max-height: 45vh; /* Allow More Height */
-  overflow-y: auto;
-  /* === Give THESE areas the card background/border/shadow === */
-  background-color: var(--bg-surface); /* Use surface background */
-  padding: 20px; /* Increased padding */
-  border-radius: 8px; /* Rounded corners */
-  border: 1px solid var(--border-primary);
-  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
-  box-shadow: 0 2px 5px var(--shadow-primary); /* Add subtle shadow here */
-}
-body.dark-mode .resources-area, body.dark-mode .transcript-area {
-    background-color: var(--dm-bg-surface); /* Use dark surface */
-    border-color: var(--dm-border-primary);
-    box-shadow: 0 2px 5px var(--dm-shadow-primary);
-}
+.resources-area, .transcript-area { white-space: pre-wrap; word-wrap: break-word; font-size: 1em; line-height: 1.7; color: var(--text-primary); max-height: 45vh; overflow-y: auto; background-color: var(--bg-surface); padding: 20px; border-radius: 8px; border: 1px solid var(--border-primary); transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; box-shadow: 0 2px 5px var(--shadow-primary); }
+body.dark-mode .resources-area, body.dark-mode .transcript-area { background-color: var(--dm-bg-surface); border-color: var(--dm-border-primary); box-shadow: 0 2px 5px var(--dm-shadow-primary); }
 
 /* --- Styles for Resource Table --- Looks professional! --- */
-.resource-table {
-  width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.95em;
-  border: 1px solid var(--border-primary); border-radius: 8px; overflow: hidden;
-  box-shadow: 0 2px 5px var(--shadow-primary); /* Add shadow to table */
-}
-.resource-table th, .resource-table td {
-  border: none; border-bottom: 1px solid var(--border-primary); padding: 12px 15px; text-align: left; vertical-align: top; background-color: var(--bg-surface);
-}
+.resource-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.95em; border: 1px solid var(--border-primary); border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px var(--shadow-primary); }
+.resource-table th, .resource-table td { border: none; border-bottom: 1px solid var(--border-primary); padding: 12px 15px; text-align: left; vertical-align: top; background-color: var(--bg-surface); }
 .resource-table tr:last-child td { border-bottom: none; }
 .resource-table th { background-color: var(--bg-primary); color: var(--text-primary); font-weight: 600; white-space: nowrap; border-bottom-width: 2px; }
-body.dark-mode .resource-table th { background-color: #3a3a4e; }
-body.dark-mode .resource-table td { background-color: var(--dm-bg-surface); }
-.resource-table a { color: var(--accent-primary); text-decoration: none; font-weight: 500; }
-.resource-table a:hover { color: var(--accent-secondary); text-decoration: underline; }
+body.dark-mode .resource-table th { background-color: #3a3a4e; } body.dark-mode .resource-table td { background-color: var(--dm-bg-surface); }
+.resource-table a { color: var(--accent-primary); text-decoration: none; font-weight: 500; } .resource-table a:hover { color: var(--accent-secondary); text-decoration: underline; }
 .resource-na { color: var(--text-secondary); font-style: italic; }
 /* --- End Resource Table Styles --- */
-
 
 /* Collapsible Section Styles */
 .collapsible-section { margin-top: 20px; }
@@ -297,15 +201,10 @@ body.dark-mode .resource-table td { background-color: var(--dm-bg-surface); }
 .collapsible-content { /* Padding/border applied to child (.transcript-area) */ }
 
 /* --- Note Divider --- Separating multiple notes --- Adjusted for Padding --- */
-hr.note-divider {
-  border: none; border-top: 1px solid var(--border-primary); /* Thinner */
-  margin: 0 40px 0 40px; /* T=0, R=40px, B=0, L=40px - Align with card padding */
-  padding-top: 50px; /* Creates space above */ padding-bottom: 50px; /* Creates space below */
-  box-sizing: content-box; height: 0; opacity: 0.5;
-}
+hr.note-divider { border: none; border-top: 1px solid var(--border-primary); margin: 0 40px 0 40px; padding-top: 50px; padding-bottom: 50px; box-sizing: content-box; height: 0; opacity: 0.5; }
 
 
-/* --- Modal Styles --- (Unchanged) --- */
+/* --- Styles for the NEW Upload Modal! --- The Popup! Using Variables! --- */
 .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--overlay-bg); display: flex; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(3px); }
 body.dark-mode .modal-overlay { --overlay-bg: rgba(26, 26, 46, 0.7); }
 .modal-content { background-color: var(--bg-surface); padding: 30px 40px; border-radius: 8px; box-shadow: 0 5px 25px var(--shadow-primary); position: relative; max-width: 500px; width: 90%; z-index: 1001; max-height: 85vh; overflow-y: auto; transition: background-color 0.3s ease, box-shadow 0.3s ease; }
@@ -315,7 +214,7 @@ body.dark-mode .modal-overlay { --overlay-bg: rgba(26, 26, 46, 0.7); }
 .modal-content .sidebar-file-upload { border-top: none; padding: 0; margin-top: 0; }
 .modal-content .sidebar-file-upload h4 { display: none; }
 
-/* Upload Mode Switcher Styles (Unchanged) */
+/* Upload Mode Switcher Styles (Themed) */
 .upload-mode-switcher { display: flex; justify-content: center; margin-bottom: 20px; gap: 10px; }
 .upload-mode-switcher button { padding: 6px 12px; border: 1px solid var(--border-primary); background-color: var(--bg-surface); color: var(--text-secondary); cursor: pointer; font-size: 0.85em; font-weight: 500; border-radius: 5px; transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease; }
 .upload-mode-switcher button:hover { background-color: var(--accent-tertiary); border-color: var(--accent-secondary); color: var(--text-primary); }
@@ -324,18 +223,112 @@ body.dark-mode .upload-mode-switcher button:hover { background-color: #3a3a4e; b
 body.dark-mode .upload-mode-switcher button.active { background-color: var(--accent-primary); border-color: var(--accent-primary); color: var(--text-on-accent); }
 .upload-mode-switcher button:disabled { background-color: transparent; color: var(--border-primary); border-color: var(--border-primary); cursor: not-allowed; opacity: 0.6; }
 
-/* Upload Input Area & Inputs (Unchanged) */
+/* Upload Input Area & Inputs */
 .upload-input-area { margin-bottom: 20px; min-height: 50px; }
 .file-input-section p { font-size: 0.8em; margin: 8px 0 0 0; color: var(--text-secondary); overflow-wrap: break-word; text-align: center; }
 .url-input-section .url-input-field { width: 100%; padding: 8px 10px; border-radius: 4px; font-size: 0.95em; box-sizing: border-box; border: 1px solid var(--border-primary); background-color: var(--bg-primary); color: var(--text-primary); transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease; }
 .url-input-section .url-input-field:focus { outline: none; border-color: var(--accent-secondary); box-shadow: 0 0 0 2px var(--accent-tertiary); }
 body.dark-mode .url-input-section .url-input-field:focus { border-color: var(--accent-secondary); box-shadow: 0 0 0 2px rgba(161, 136, 218, 0.3); }
 
-/* Main Upload/Submit Button (inside modal) (Unchanged) */
+/* Main Upload/Submit Button (inside modal) */
 .modal-content .main-upload-button { display: block; width: 100%; padding: 10px 15px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 1em; transition: background-color 0.2s ease, opacity 0.2s ease; margin-top: 5px; background-color: var(--accent-primary); color: var(--text-on-accent); }
 .modal-content .main-upload-button:hover { background-color: var(--accent-secondary); }
 .modal-content .main-upload-button:disabled { background-color: var(--accent-tertiary); opacity: 0.7; cursor: not-allowed; }
 /* --- End Modal Styles --- */
+
+
+/* --- !!! DELETE BUTTON STYLES - Increased Specificity & Checked Rules !!! --- */
+/* Base style for ALL delete buttons */
+.delete-button {
+  background: none;
+  border: none;
+  /* === Set Base Color Directly === */
+  color: var(--accent-primary); /* Default: Use accent color */
+  cursor: pointer;
+  padding: 2px 4px;
+  font-size: 1em; /* Let emoji inherit size or set explicitly */
+  line-height: 1;
+  opacity: 1.0; /* Fully opaque */
+  transition: color 0.2s ease, transform 0.1s ease;
+  /* Reset font smoothing just in case */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+/* Base hover for ALL delete buttons */
+.delete-button:hover {
+  /* Use !important to ensure red hover takes precedence */
+  color: #e74c3c !important; /* Red hover */
+  transform: scale(1.1);
+}
+.delete-button:active {
+    transform: scale(0.95);
+}
+
+/* Specific styles for delete buttons INSIDE the sidebar */
+.sidebar .delete-button { /* Specificity */
+    margin-left: auto; padding-left: 8px; font-size: 0.9em; flex-shrink: 0;
+}
+.sidebar .topic-delete-button { /* Specificity */
+    padding-left: 8px; flex-shrink: 0;
+}
+
+/* Specific styles for delete button INSIDE the note header */
+.note-delete-button {
+    font-size: 1.1em; padding: 5px; flex-shrink: 0; order: -1;
+    opacity: 0.6; /* Keep note delete slightly faded by default */
+    /* === FIX: Ensure correct default color if different === */
+    color: var(--text-secondary); /* Override base accent color for note delete */
+}
+.note-delete-button:hover {
+     opacity: 1.0; /* Override base hover opacity if needed */
+     /* The base .delete-button:hover rule with !important will handle the red color */
+}
+
+/* === Dark Mode Delete Button Colors - INCREASED SPECIFICITY === */
+/* Target sidebar delete buttons specifically in dark mode */
+body.dark-mode .sidebar .delete-button {
+    /* Use !important to force override */
+    color: #ff7b7b !important; /* Lighter red default for dark mode sidebar */
+}
+/* Target note delete button specifically in dark mode */
+body.dark-mode .note-delete-button {
+    /* Use !important to force override */
+    color: var(--text-secondary) !important; /* Keep secondary color for note delete */
+    opacity: 0.6; /* Maintain fade */
+}
+/* Dark mode HOVER for ALL delete buttons - using !important */
+body.dark-mode .delete-button:hover {
+    color: #ff4d4d !important; /* Brighter red hover for dark mode */
+}
+/* Ensure dark mode note delete hover gets the bright red too */
+body.dark-mode .note-delete-button:hover {
+     opacity: 1.0; /* Override opacity */
+     /* Color handled by the general dark mode hover rule above */
+}
+
+
+/* Style for marked items - Increased Specificity */
+.subject-header-container .marked-for-delete,
+.class-header-container .marked-for-delete,
+.topic-item-container .marked-for-delete {
+    text-decoration: line-through;
+    text-decoration-color: #e74c3c !important; /* Use !important to ensure override */
+    text-decoration-thickness: 2px;
+    opacity: 0.7; /* Make text slightly faded */
+    transition: opacity 0.2s ease, text-decoration-color 0.2s ease;
+    color: inherit !important; /* Don't change base text color, just add decoration */
+}
+/* Hover on marked items */
+.clickable-header:hover .marked-for-delete,
+.topic-item-container:hover .marked-for-delete {
+    opacity: 0.8; /* Make slightly more visible on hover */
+}
+/* --- End Delete Button Styles --- */
+
+
+/* --- Optional: Overlay during delete operation --- */
+.delete-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.5); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.5em; z-index: 2000; }
+/* --- End Delete Overlay --- */
 
 
 /* --- Scrollbar Styling --- Using Variables! --- Optional, but nice! --- */
