@@ -49,7 +49,7 @@ Built for the BitCamp 2025 Hackathon!
 
 **Database:**
 
-*   MongoDB (e.g., MongoDB Atlas free tier or local instance)
+*   MongoDB
 
 **Deployment (Planned/Actual):**
 
