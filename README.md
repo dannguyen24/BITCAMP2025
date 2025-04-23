@@ -39,7 +39,7 @@ Built for the BitCamp 2025 Hackathon!
 *   **Framework:** Python + Flask
 *   **Environment:** `python-dotenv`
 *   **Audio Download:** `yt-dlp`
-*   **Database:** MongoDB (likely via `pymongo`)
+*   **Database:** MongoDB 
 
 **AI Services:**
 
