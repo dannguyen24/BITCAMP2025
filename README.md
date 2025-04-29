@@ -1,27 +1,20 @@
-# StudyEZ ✨📚
-
-**Transform Lectures into Knowledge, Effortlessly.**
+# StudyEZ
 
 StudyEZ is a web application designed to help students process and organize lecture recordings. Upload audio/video files or provide URLs, and StudyEZ uses AI to generate transcriptions, summaries, identify key topics, and find relevant external resources. All notes are automatically categorized by Subject, Class, and Topic, presented in an intuitive, navigable interface.
 
-Built for the BitCamp 2025 Hackathon!
-
 ## Key Features
 
-*   **Lecture Upload:** Upload audio/video files directly or provide a URL (e.g., YouTube) for processing.
-*   **AI-Powered Transcription:** Utilizes AssemblyAI to generate accurate transcripts from lecture audio.
-*   **Intelligent Analysis (via Google Gemini):**
+*   **Lecture Upload:** Upload audio/video files directly or provide a URL (ex: YouTube) for processing.
+*   **AI-Powered Transcription:** Utilizes _AssemblyAI_ to generate accurate transcripts from lecture audio.
+*   **Google-Gemini:**
     *   **Automatic Categorization:** Identifies the Subject, Class, and specific Topic of the lecture.
     *   **Summarization:** Generates concise summaries of the lecture content.
     *   **Sub-Topic Identification:** Extracts key sub-topics discussed within the lecture.
 *   **Resource Generation:**
-    *   Automatically finds relevant web articles (via Google Search) and YouTube videos for each identified sub-topic.
+    *   Automatically finds relevant web articles (via _Google Search API_) and YouTube videos for each identified sub-topic.
     *   Presents resources in a clear table format.
 *   **Organized Navigation:** Displays lectures in a hierarchical, collapsible sidebar (Subject -> Class -> Topic).
 *   **Detailed Note View:** Shows upload date, topics covered, summary, structured resources, and a collapsible transcript for each lecture entry. Allows multiple entries per topic.
-*   **Customizable UI:**
-    *   Resizable sidebar.
-    *   Dark/Light theme toggle with preference saved locally.
 *   **Content Management:** Delete specific lecture notes, or entire Topic, Class, or Subject folders (with confirmation).
 
 ## Tech Stack
@@ -31,19 +24,18 @@ Built for the BitCamp 2025 Hackathon!
 *   **Framework:** React
 *   **Build Tool:** Vite
 *   **Routing:** `react-router-dom`
-*   **HTTP Client:** `axios` (for uploads), `fetch` API
-*   **Styling:** CSS with CSS Variables (supporting Dark/Light themes with a purple motif)
+*   **HTTP Client:** `axios`
 
 **Backend:**
 
 *   **Framework:** Python + Flask
 *   **Environment:** `python-dotenv`
 *   **Audio Download:** `yt-dlp`
-*   **Database:** MongoDB 
 
 **AI Services:**
 
 *   **Transcription:** AssemblyAI API
+*   **Audio extraction from Youtube videos**: yt-dlp
 *   **Analysis & Summarization:** Google Generative AI API (Gemini)
 *   **Resource Finding:** Google Custom Search API
 
@@ -51,7 +43,7 @@ Built for the BitCamp 2025 Hackathon!
 
 *   MongoDB
 
-**Deployment (Planned/Actual):**
+**Deployment (Planned):**
 
 *   **Target Domain:** `studyeasy.tech`
 
@@ -139,7 +131,7 @@ Follow these steps to get a local copy up and running.
 *   **Frontend:** Currently deployed on localhost
 *   **Backend:** Currently deployed on localhost
 
-## Team Members (BitCamp 2025)
+## Team Members
 
 *   Dan Nguyen
 *   Abdullah Ali
@@ -148,7 +140,7 @@ Follow these steps to get a local copy up and running.
 
 ## Potential Future Improvements
 
-*   **Real User Authentication:** Implement Google OAuth for secure login/signup.
+*   **Real User Authentication:** Implement Authentication using OAuth for secure login/signup.
 *   **User-Specific Notes:** Associate uploaded lectures and notes with individual user accounts.
 *   **Database Storage for Files:** Use AWS S3 or similar for robust storage of original media files instead of just local/temporary storage.
 *   **Enhanced Resource Generation:** Generate different types of resources (e.g., flashcards, practice questions).
