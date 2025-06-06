@@ -1,0 +1,10 @@
+Flask
+pymongo[srv]
+Flask-PyMongo
+assemblyai
+dotenv
+yt_dlp
+datetime
+requests
+flask_cors
+google-generativeai

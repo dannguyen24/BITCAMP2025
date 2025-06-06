@@ -3,8 +3,7 @@ import requests
 from flask_cors import CORS
 #Library for .env variable access
 from dotenv import load_dotenv
-#Library for loggging errors
-import logging
+
 #For manipulating paths
 import os
 #For transcriptions 
@@ -29,7 +28,7 @@ from moviepy import VideoFileClip
 
 
 #Define config for logging
-logging.basicConfig(level=logging.INFO)
+# logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__)
 #Allow connection with frontend
@@ -106,16 +105,16 @@ def upload_file():
             'topic': content["topic"],
         }
         result = db.Documents.insert_one(document)
-        logging.info(f"Inserted document ID: {result.inserted_id}")
+        # logging.info(f"Inserted document ID: {result.inserted_id}")
 
 
-        logging.info("Temporary files cleaned up")
+        # logging.info("Temporary files cleaned up")
         return jsonify({
             "success": True,
             "inserted_id": str(result.inserted_id)
         })
     except Exception as e:
-        logging.error(f"An error occurred: {e}")
+        # logging.error(f"An error occurred: {e}")
         return jsonify({"error": str(e)}), 500
 
 
@@ -158,14 +157,14 @@ def upload_link():
     #This is the path of where to store the audio. Audio will be named audio1
     output_path = os.path.join('audio', 'audio1')
     try:
-        logging.info(f"Downloading audio from: {video_url}")
+        # logging.info(f"Downloading audio from: {video_url}")
         #Download the audio files to audio folder by calling download_audio function
         download_audio(video_url, output_path)
-        logging.info(f"Audio downloaded to: {output_path}")
+        # logging.info(f"Audio downloaded to: {output_path}")
         #Get transcription from the file path
         return transcribe(output_path)
     except Exception as e:
-        logging.error(f"An error occurred: {e}")
+        # logging.error(f"An error occurred: {e}")
         return jsonify({"error": str(e)}), 500
 
 @app.route('/transcripts', methods=['GET'])
@@ -239,7 +238,7 @@ def transcribe(audio_path):
     try:
         #audio_path doesn't include the file type, so we have to use string concatenation to add ".wav"
         transcript = transcriber.transcribe(audio_path + ".wav")
-        logging.info("Transcription completed")
+        # logging.info("Transcription completed")
         #Delete the audio file from the folder
         clean_up(audio_path + ".wav")
         
@@ -263,20 +262,20 @@ def transcribe(audio_path):
             'topic': content["topic"],
         }
         result = db.Documents.insert_one(document)
-        logging.info(f"Inserted document ID: {result.inserted_id}")
+        # logging.info(f"Inserted document ID: {result.inserted_id}")
 
         
         #Generating creating summary from the transcription
         
         #Add summary to mongoDB
         
-        logging.info("Temporary files cleaned up")
+        # logging.info("Temporary files cleaned up")
         return jsonify({
             "transcript": transcript.text,
             "inserted_id": str(result.inserted_id)
             })
     except Exception as e:
-        logging.error(f"An error occurred: {e}")
+        # logging.error(f"An error occurred: {e}")
         return jsonify({"error": str(e)}), 500
 
 #Delete the audio file from the audio folder
@@ -332,7 +331,6 @@ def search_resources(subtopics):
             "youtubeLink": youtube,
         })
       
-
     return topic_resources
 
 #####SAI's CODE=================End=========================================
